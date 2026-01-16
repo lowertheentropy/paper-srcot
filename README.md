@@ -213,21 +213,3 @@ If your logs contain item identifiers (e.g., `con_fuel_mix`, `con_marking_tape`)
 
 - **Question is underspecified**  
   → Judge can recommend a `Refocus` action; alternatively adjust prompts to ask clarifying questions in pass1.
-
----
-
-## Repo layout suggestion
-
-```
-.
-├── srcot.py
-├── README.md
-├── examples/
-│   ├── environment.json
-│   ├── memory.json
-│   ├── knowledge.json
-│   └── experiences.json
-└── outputs/
-    ├── result.json
-    └── report.md
-```
