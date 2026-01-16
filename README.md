@@ -213,3 +213,15 @@ If your logs contain item identifiers (e.g., `con_fuel_mix`, `con_marking_tape`)
 
 - **Question is underspecified**  
   → Judge can recommend a `Refocus` action; alternatively adjust prompts to ask clarifying questions in pass1.
+
+---
+
+## Medical safety and intended use
+
+This repository is a **research prototype** and is not affiliated with any vendor or agency. It is not a certified medical device and must not replace professional training, clinical judgment, or official protocols. In operational settings, SOPs and validated guidelines remain the ground truth. Validate outputs against official SOPs/guidelines.
+
+---
+
+## AI assistance disclaimer
+
+Parts of the code, language editing, sentence structuring, and grammar refinement in this project and paper were supported by AI-based tools (e.g., DeepL, ChatGPT GPT-5.1, GPT-5.2) to improve readability and linguistic clarity. However, the scientific content, conceptual development, data evaluation, and all critical analyses were carried out entirely by the authors without automated assistance. The use of such tools was limited to linguistic optimization and did not influence the intellectual or methodological integrity of the work. The author of this repository or paper is not affiliated with, endorsed by, or officially connected to any organization mentioned in this project. The analysis and opinions expressed are solely those of the author and do not represent the views or positions of the mentioned entities.
