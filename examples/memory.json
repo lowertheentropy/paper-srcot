@@ -1,0 +1,156 @@
+ [
+   {
+    "eventId": "evt_mkgr30td_cg4tsu",
+    "einsatzNr": "000066",
+    "realT": 1768560350788,
+    "simT": 569855,
+    "content": "FL M 2/46/1: disponiert (FW_HLF)",
+    "meta": null,
+    "vehicleType": "FW_HLF",
+    "vehicleId": "hlf_3",
+    "callsign": "FL M 2/46/1"
+  },
+  {
+    "eventId": "evt_mkgr30td_cg4tsu",
+    "einsatzNr": "000066",
+    "realT": 1768560350789,
+    "simT": 569855,
+    "content": "FL M 2/59/1: disponiert (FW_GW)",
+    "meta": null,
+    "vehicleType": "FW_GW",
+    "vehicleId": "gw_2",
+    "callsign": "FL M 2/59/1"
+  },
+  {
+    "eventId": "evt_mkgr30td_cg4tsu",
+    "einsatzNr": "000066",
+    "realT": 1768560350789,
+    "simT": 569855,
+    "content": "KI-Vorschlag umgesetzt: FW_HLF, FW_GW (zugeteilt: FL M 2/46/1, FL M 2/59/1)",
+    "meta": null,
+    "vehicleType": null,
+    "vehicleId": null,
+    "callsign": null
+  },
+  {
+    "eventId": "evt_mkgr30td_cg4tsu",
+    "einsatzNr": "000066",
+    "realT": 1768560352386,
+    "simT": 570105,
+    "content": "FL M 2/46/1: Fahrzeug en route zur Anlaufstelle, ETA 10 Minuten, Verkehrslage aktuell stabil.",
+    "meta": "Anfahrt",
+    "vehicleType": "FW_HLF",
+    "vehicleId": "hlf_3",
+    "callsign": "FL M 2/46/1"
+  },
+  {
+    "eventId": "evt_mkgr30td_cg4tsu",
+    "einsatzNr": "000066",
+    "realT": 1768560354015,
+    "simT": 570105,
+    "content": "FL M 2/59/1: Fahrzeug en route zur Anlaufstelle, ETA 12 Minuten, Verkehrslage unauffällig.",
+    "meta": "Anfahrt",
+    "vehicleType": "FW_GW",
+    "vehicleId": "gw_2",
+    "callsign": "FL M 2/59/1"
+  },
+  {
+    "eventId": "evt_mkgr4aia_3xl8t1",
+    "einsatzNr": "000067",
+    "realT": 1768560601095,
+    "simT": 820274,
+    "content": "FL M 2/30/1: disponiert (FW_DLK)",
+    "meta": null,
+    "vehicleType": "FW_DLK",
+    "vehicleId": "dlk_3",
+    "callsign": "FL M 2/30/1"
+  },
+  {
+    "eventId": "evt_mkgr4aia_3xl8t1",
+    "einsatzNr": "000067",
+    "realT": 1768560601095,
+    "simT": 820274,
+    "content": "FL M 2/11/1: disponiert (FW_ELW)",
+    "meta": null,
+    "vehicleType": "FW_ELW",
+    "vehicleId": "elw_2",
+    "callsign": "FL M 2/11/1"
+  },
+  {
+    "eventId": "evt_mkgr4aia_3xl8t1",
+    "einsatzNr": "000067",
+    "realT": 1768560601096,
+    "simT": 820274,
+    "content": "RK M 1/83/1: disponiert (RTW)",
+    "meta": null,
+    "vehicleType": "RTW",
+    "vehicleId": "rtw_1",
+    "callsign": "RK M 1/83/1"
+  },
+  {
+    "eventId": "evt_mkgr4aia_3xl8t1",
+    "einsatzNr": "000067",
+    "realT": 1768560601096,
+    "simT": 820274,
+    "content": "RK M 1/82/2: disponiert (NEF)",
+    "meta": null,
+    "vehicleType": "NEF",
+    "vehicleId": "nef_2",
+    "callsign": "RK M 1/82/2"
+  },
+  {
+    "eventId": "evt_mkgr4aia_3xl8t1",
+    "einsatzNr": "000067",
+    "realT": 1768560601096,
+    "simT": 820274,
+    "content": "KI-Vorschlag umgesetzt: FW_DLK, FW_ELW, RTW, NEF (zugeteilt: FL M 2/30/1, FL M 2/11/1, RK M 1/83/1, RK M 1/82/2)",
+    "meta": null,
+    "vehicleType": null,
+    "vehicleId": null,
+    "callsign": null
+  },
+  {
+    "eventId": "evt_mkgr4aia_3xl8t1",
+    "einsatzNr": "000067",
+    "realT": 1768560824700,
+    "simT": 1043090,
+    "content": "FL M 2/30/1: Betreuung der Fahrgäste wird weiterhin intensiv fortgeführt, mehrere Personen zeigen starke Panikreaktionen, Status 4 bleibt.",
+    "meta": "Vor Ort",
+    "vehicleType": "FW_DLK",
+    "vehicleId": "dlk_3",
+    "callsign": "FL M 2/30/1"
+  },
+  {
+    "eventId": "evt_mkgr4aia_3xl8t1",
+    "einsatzNr": "000067",
+    "realT": 1768560835185,
+    "simT": 1054381,
+    "content": "RK M 1/83/1: Eintreffen an Einsatzstelle",
+    "meta": null,
+    "vehicleType": "RTW",
+    "vehicleId": "rtw_1",
+    "callsign": "RK M 1/83/1"
+  },
+  {
+    "eventId": "evt_mkgr4aia_3xl8t1",
+    "einsatzNr": "000067",
+    "realT": 1768560836747,
+    "simT": 1054632,
+    "content": "RK M 1/83/1: Betreuung der Fahrgäste begonnen, mehrere zeigen starke Unruhe. Situation bleibt angespannt, Status 4.",
+    "meta": "Vor Ort",
+    "vehicleType": "RTW",
+    "vehicleId": "rtw_1",
+    "callsign": "RK M 1/83/1"
+  },
+  {
+    "eventId": "evt_mkgr4aia_3xl8t1",
+    "einsatzNr": "000067",
+    "realT": 1768560846832,
+    "simT": 1064417,
+    "content": "FL M 2/11/1: Betreuung der Fahrgäste wird fortgesetzt, einige benötigen weiterhin psychosoziale Unterstützung, Status 4 bleibt bestehen.",
+    "meta": "Vor Ort",
+    "vehicleType": "FW_ELW",
+    "vehicleId": "elw_2",
+    "callsign": "FL M 2/11/1"
+  }
+]
