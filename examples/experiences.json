@@ -1,0 +1,83 @@
+[
+  {
+    "meta": "RD | Atemnot | Wohnungsnotfall | Nachforderung",
+    "content": "Vergangener Einsatz (sim) 02.01.2026 21:14. Lage: akute Atemnot, unklare Ursache, enge Wohnung. Entscheidung: früh NEF nachfordern, weil Zustand dynamisch und Rückmeldungen unklar. Ergebnis: NEF vor Eintreffen RTW angefordert, Kommunikation verbessert."
+  },
+  {
+    "meta": "RD | Sturz | Treppenhaus | Tragehilfe",
+    "content": "Vergangener Einsatz (sim) 03.01.2026 10:22. Lage: Patient im 4. OG ohne Aufzug, Mobilität eingeschränkt. Entscheidung: FW_HLF für Tragehilfe nachgefordert, nachdem im Log 'Treppenhaus eng' und 'Transport schwierig' auftauchte. Ergebnis: Transportprozess schneller, weniger Verzögerung."
+  },
+  {
+    "meta": "RD | MANV | Sichtung | Sanitätskomponente",
+    "content": "Vergangener Einsatz (sim) 04.01.2026 17:40. Lage: MANV, mehrere Betroffene, Sichtung läuft. Entscheidung: FW_GW_SAN früh alarmiert, zusätzlich FW_ELW für Koordination. Ergebnis: strukturierte Lageführung; Nachforderungen reduzierten sich."
+  },
+  {
+    "meta": "FW | Küchenbrand | Rauchentwicklung | Standard-AAO",
+    "content": "Vergangener Einsatz (sim) 05.01.2026 19:05. Lage: Küchenbrand, Rauchentwicklung in Mehrparteienhaus. Muster: AAO-Vorschlag FW_HLF + FW_DLK + FW_ELW war in den ersten Minuten ausreichend. Wenn keine 'Person vermisst' / 'Rettung über Leiter' / 'Ausbreitung' in Logs: keine zusätzliche DLK-Nachforderung."
+  },
+  {
+    "meta": "FW | Brand | Person vermisst | DLK-Nachforderung",
+    "content": "Vergangener Einsatz (sim) 06.01.2026 03:12. Lage: Brand, Hinweis 'Person vermutlich noch im Gebäude' im Funk. Entscheidung: FW_DLK sofort nachfordern (Menschenrettung/Anleiterbereitschaft) + FW_ELW zur Koordination. Ergebnis: schnellere Strukturierung, klare Aufgabenverteilung."
+  },
+  {
+    "meta": "THL | Verkehrsunfall | eingeklemmt | HLF-Trigger",
+    "content": "Vergangener Einsatz (sim) 07.01.2026 08:48. Lage: VU, Hinweis 'eingeklemmt' im Erstlog. Entscheidung: FW_HLF als zwingend, zusätzlich FW_LF wenn Rauch/Brandgeruch gemeldet wird. Ergebnis: Unterdeckung vermieden; frühe Nachforderung war sinnvoll."
+  },
+  {
+    "meta": "THL | Wasser im Keller | Pumpenbedarf | GW-Trigger",
+    "content": "Vergangener Einsatz (sim) 08.01.2026 23:30. Lage: Wasser im Keller, Pegel steigend, 'Stromkasten feucht' in Logs. Entscheidung: FW_GW nachfordern (Pumpen/Absicherung), weil HLF alleine gebunden war. Ergebnis: Lage schneller stabilisiert."
+  },
+  {
+    "meta": "Leitstelle | Funklage unklar | Eskalationsregel",
+    "content": "Vergangener Einsatz (sim) 09.01.2026 14:07. Muster: Wenn Funkverkehr über >5 Minuten 'not specified' bleibt oder nur sehr vage Rückmeldungen kommen, Entscheidung: FW_ELW (bei FW-Lagen) bzw. NEF (bei RD-Lagen) als Unterstützungs-/Koordinationsressource prüfen."
+  },
+  {
+    "meta": "Disposition | Unterdeckung | unbeschickter Einsatz",
+    "content": "Vergangener Einsatz (sim) 10.01.2026 11:55. Muster: Unbeschickter Einsatz + AAO-Vorschlag vorhanden → Empfehlung entspricht meist AAO (unitTypes = AAO), solange keine widersprechenden Logs/Funk vorliegen. Ergebnis: konsistente Erstalarmierung."
+  },
+  {
+    "meta": "Disposition | Überdeckung vermeiden | bereits zugeteilt",
+    "content": "Vergangener Einsatz (sim) 11.01.2026 16:20. Muster: Wenn Assigned-Einheiten bereits alle AAO-Typen abdecken und Logs 'Lage stabil' / 'kein weiterer Bedarf' enthalten, keine weiteren Nachforderungen. Ergebnis: Ressourcen geschont."
+  },
+  {
+    "meta": "RD | MANV | Sanitätskomponente | Baseline-Regel",
+    "content": "Vergangener Einsatz (sim) 04.01.2026 17:40. MANV-Muster: Sobald FW_GW_SAN disponiert wird, prüfen wir eine Mindestbegleitung durch RD: mindestens 1 GW-SAN + 4 RTW + 1 NEF zusätzlich (oder äquivalent bereits gebundene Kräfte). Begründung: GW_SAN erzeugt Behandlungs-/Sichtungsbedarf und bindet Koordination; reine FW-Komponente reicht selten."
+  },
+  {
+    "meta": "RD | MANV 50 | AAO-Abgleich | Nachforderung",
+    "content": "Vergangener Einsatz (sim) 06.01.2026 12:10. MANV 50: Wenn AAO zu knapp wirkt oder RD-Kräfte noch nicht vor Ort sind, ergänzen wir zur SAN-Komponente als Baseline 4 RTW + 1 NEF (abzüglich bereits zugeteilter/aktiver Kräfte). Ziel: Transport-/Sichtungskapazität früh sicherstellen."
+  },
+  {
+    "meta": "RD | MANV 100 | AAO-Abgleich | Skalierung",
+    "content": "Vergangener Einsatz (sim) 08.01.2026 18:25. MANV 100: AAO liefert häufig hohe RTW/NEF-Zahlen. Trotzdem gilt: sobald FW_GW_SAN aktiv ist, mindestens 2 GW-SAN + 6 RTW + 2 NEF als 'sichere Untergrenze' sicherstellen (falls AAO/Verfügbarkeit schwankt). Wenn AAO bereits 8 RTW + 2 NEF abdeckt, keine zusätzliche Eskalation nur wegen GW_SAN."
+  },
+  {
+    "meta": "Leitstelle | MANV | Differenzregel (nur fehlende Typen)",
+    "content": "Vergangener Einsatz (sim) 09.01.2026 09:05. Regel: Bei MANV empfehlen wir nur die Differenz zur Baseline (fehlende unitTypes), nicht die komplette Liste. Beispiel: Wenn schon 3 RTW disponiert sind, empfehlen wir nur +1 RTW (und ggf. NEF), statt erneut 4 RTW zu nennen."
+  },
+  {
+    "meta": "MANV | Führung | FW_ELW | Baseline-Regel",
+    "content": "Vergangener Einsatz (sim) 05.01.2026 14:20. MANV: Für Koordination/Lageführung ist FW_ELW früh sinnvoll. Wenn MANV läuft und kein ELW disponiert ist, empfehlen wir mindestens 1× FW_ELW (oder vorhandene Führungsfunktion bereits aktiv)."
+  },
+  {
+    "meta": "MANV | Brand/Rauch | FW_HLF | Trigger-Regel",
+    "content": "Vergangener Einsatz (sim) 07.01.2026 19:05. MANV + Brand/Rauch/unklare Lage: Wenn Domain=feuerwehr ODER Logs/Funk auf Rauch/Feuer/Evakuierung hinweisen, fordern wir zusätzlich mindestens 1× FW_HLF an (Brandbekämpfung/Technik/erste Maßnahmen), sofern noch nicht vor Ort."
+  },
+  {
+    "meta": "MANV | Brandlage | Skalierung | FW_HLF/FW_LF/FW_DLK",
+    "content": "Vergangener Einsatz (sim) 10.01.2026 08:40. MANV mit bestätigter Brandlage: Neben San-Komponente prüfen wir eine gestaffelte FW-Nachforderung: mindestens FW_HLF + optional FW_LF; FW_DLK nur wenn Höhenrettung/Etagen/Anleiter-Bedarf in Logs/Funk genannt ist. Empfehlung immer als Differenz (nur fehlende Typen)."
+  },
+  {
+    "meta": "MANV | Unterdeckung | Differenzregel (nur fehlende Typen)",
+    "content": "Vergangener Einsatz (sim) 11.01.2026 16:15. Bei MANV empfehlen wir nur fehlende Einheiten-Typen: bereits zugeteilte/aktive Kräfte werden abgezogen. So vermeiden wir doppelte Vorschläge (z.B. HLF bereits disponiert -> nicht erneut empfehlen)."
+  },
+
+  {
+    "meta": "Blackout | Krankenhaus | Notstrom | Generatorlogistik",
+    "content": "Vergangener Einsatz (sim) 12.01.2026 06:30. Lage: großflächiger Stromausfall, Krankenhaus meldet Notstrom kritisch. Entscheidung: FW_GW für Logistik (Generator/Diesel) + FW_ELW für Koordination + FW_HLF als technische Absicherung. Ergebnis: klare Priorisierung, weniger Parallel-Fehlfahrten."
+  },
+  {
+    "meta": "Blackout | Leuchtturm | NFI (Non-food-items) / FI (Food-items) | Versorgungsbedarf",
+    "content": "Vergangener Einsatz (sim) 12.01.2026 07:10. Lage: KatS-Leuchtturm aktiviert, Bedarf an Decken/Wasser/Batterien. Entscheidung: FW_GW_SAN (Versorgung) + FW_ELW (Führung) + FW_HLF (Beleuchtung/Absperrung). Ergebnis: NFI-Bedarf wurde strukturiert und als Plan ausgegeben; keine unrealistischen Mengen, bei fehlendem Inventar: 'not specified' markiert."
+  }
+]
