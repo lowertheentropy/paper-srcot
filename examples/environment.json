@@ -1,0 +1,46 @@
+[
+  {
+    "meta": "Ressourcen-Katalog",
+    "content": "Gültige unitTypes (müssen exakt so geschrieben werden):\n- RTW\n- NEF\n- FW_LF\n- FW_HLF\n- FW_DLK\n- FW_GW\n- FW_ELW\n- FW_GW_SAN\n\nHinweis: Wenn du Einheiten empfiehlst, nutze ausschließlich diese unitTypes. Keine neuen/anderen Namen erfinden.\n\nRegel: Duplikate in unitTypes bedeuten Stückzahl (z.B. [\"RTW\",\"RTW\",\"NEF\"])."
+  },
+  {
+    "meta": "Callsign-Beispiele",
+    "content": "Beispiele Callsigns pro unitType (Auswahl):\n- RTW: RK M 1/83/1, RK M 2/83/1, RK M 3/83/1\n- NEF: RK M 1/82/1, RK M 1/82/2, RK M 2/82/1\n- FW_LF: FL M 1/40/1, FL M 2/40/1, FL M 3/40/1\n- FW_HLF: FL M 1/46/1, FL M 2/46/1, FL M 3/46/1\n- FW_DLK: FL M 1/30/1, FL M 2/30/1, FL M 3/30/1\n- FW_GW: FL M 1/59/1, FL M 2/59/1, FL M 3/59/1\n- FW_ELW: FL M 1/11/1, FL M 2/11/1\n- FW_GW_SAN: FL M 1/59/50, FL M 2/59/50\n\nWichtig: Callsigns sind nur Identifikatoren. Für Empfehlungen gibst du unitTypes zurück."
+  },
+  {
+    "meta": "Stationen",
+    "content": "Wachen/Stationen:\n- st_rd_zentrum: RD Wache Zentrum (48.137, 11.575)\n- st_rd_west: RD Wache West (48.148, 11.530)\n- st_rd_ost: RD Wache Ost (48.128, 11.630)\n- st_fw_1: FW Wache 1 (48.135, 11.570)\n- st_fw_2: FW Wache 2 (48.155, 11.590)\n- st_fw_3: FW Wache 3 (48.120, 11.560)"
+  },
+  {
+    "meta": "Krankenhäuser",
+    "content": "Krankenhäuser (sim):\n- kh_klinikum: Klinikum (sim) (48.151, 11.590)\n- kh_sued: KH Süd (sim) (48.110, 11.560)\n- kh_west: KH West (sim) (48.146, 11.515)\n- kh_ost: KH Ost (sim) (48.125, 11.665)\n- kh_nord: KH Nord (sim) (48.190, 11.570)"
+  },
+  {
+    "meta": "AAO-Logik",
+    "content": "AAO (mechanischer Vorschlag) wird vom System je Einsatz erzeugt. Für 'Unterdeckung' gilt:\n- Wenn ein Einsatz unbeschickt ist (Assigned: none) UND AAO-Vorschlag existiert, ist das in der Regel Unterdeckung.\n- Wenn bereits Einheiten vor Ort/zugeteilt sind, prüfe anhand Logs/Funk, ob AAO vollständig ist oder Nachforderungen nötig sind.\n- Empfehlungen sollen sich an AAO + Lageentwicklung (Logs/Funk) orientieren.\n\nRegel (Differenz statt Vollalarm): Wenn Einheiten bereits zugeteilt/aktiv sind, empfehle nur die fehlenden unitTypes (Differenz), nicht erneut die komplette AAO-Liste."
+  },
+  {
+    "meta": "Blackout-Modus (KatS)",
+    "content": "Wenn CONTEXT auf 'BLACKOUT' / 'Stromausfall' / 'Leuchtturm' / 'Notstrom' hindeutet, behandle es als Sonderlage.\nPrioritäten im Blackout (grob):\n1) Kritische Infrastruktur (Krankenhaus/Notstrom/Generatorlogistik) → FW_GW + FW_ELW + FW_HLF (mindestens)\n2) KatS-Leuchttürme (Versorgungs- & Informationspunkte) → FW_ELW + FW_HLF + FW_GW_SAN (je nach Lage)\n3) Pflege/Betreuungseinrichtungen → RD-Komponente (RTW/NEF) + ggf. FW_HLF (Zugang/Tragehilfe/THL)\n4) THL-Folgeereignisse (Aufzug, Verkehr, Wasser) → FW_HLF, ggf. FW_GW\n\nBlackout-Regel: Koordination ist entscheidend. Wenn mehrere Teilereignisse laufen oder Funklage unklar ist: FW_ELW als Führungs-/Koordinationsressource früh prüfen."
+  },
+  {
+    "meta": "NFI & Humanitarian Logistics (einfaches Modell)",
+    "content": "NFI = Non-Food Items (z.B. Decken, Wasser, Batterien, Powerbanks, Hygiene-Kits, Arbeitslicht). Diese können als 'consumables' im Fahrzeug-Inventar vorkommen.\n\nWenn CONTEXT 'demands' (Bedarf) enthält, gilt:\n- Ziel ist: Bedarf so gut wie möglich zu bedienen.\n- Empfehle unitTypes, die plausibel NFI/Logistik tragen (typisch: FW_GW, FW_GW_SAN, FW_ELW, FW_HLF).\n- Wenn Inventarstände im CONTEXT sichtbar sind: nutze sie. Sonst: konservativ bleiben und 'not specified' markieren.\n\nWichtig: In dieser Simulation ist Logistics zunächst eine PLANUNG (keine automatische Umsetzung).\nWenn nach Logistics gefragt wird: erst ein JSON-Plan, danach kurze Begründung mit CONTEXT-Zitaten."
+  },
+  {
+    "meta": "UI-Ausgabeformat (Unterdeckung / KI Empfehlung)",
+    "content": "Wenn nach 'Unterdeckung' oder 'KI Empfehlung' gefragt wird, starte mit 'Direct Answer' und gib als erstes ein JSON-Objekt (eine Zeile) im Schema:\n{ \"unitTypes\": [\"RTW\"], \"reason\": \"kurz\", \"confidence\": 0.0 }\nDanach kurze Begründung anhand CONTEXT (Logs/Funk/AAO).\n\nRegeln:\n- unitTypes nur aus Ressourcen-Katalog\n- Duplikate = Stückzahl\n- Wenn unklar: unitTypes=[] und reason='not specified' (oder begründet, warum keine Empfehlung möglich ist)"
+  },
+  {
+    "meta": "UI-Ausgabeformat (Logistics Plan)",
+    "content": "Wenn nach 'Logistics' / 'Humanitarian Logistics' / 'NFI' gefragt wird, beginne mit 'Direct Answer' und gib als erstes GENAU 1 JSON-Objekt (eine Zeile) mit Schema:\n{ \"tasks\": [ {\"target\":\"...\",\"items\":[{\"id\":\"nfi_water\",\"qty\":10}],\"suggestedUnits\":[\"FW_GW_SAN\"],\"priority\":1,\"reason\":\"kurz\"} ] }\n\nRegeln:\n- 'target' = kurz (z.B. 'Leuchtturm', 'Krankenhaus', 'Pflegeheim')\n- 'items' = NFI/Logistikbedarf, qty konservativ\n- 'suggestedUnits' = unitTypes (Duplikate möglich)\n- Danach: kurze Begründung mit CONTEXT-Zitaten (demands/logs/memory)\n- Wenn etwas fehlt: reason enthält 'not specified'"
+  },
+  {
+    "meta": "MANV- & Sanitätskomponente (Baseline, Differenzregel)",
+    "content": "MANV-Muster (vereinfachte Heuristik):\n- Sobald FW_GW_SAN disponiert/aktiv ist, prüfe RD-Mindestbegleitung (als Untergrenze): 4× RTW + 1× NEF zusätzlich (abzüglich bereits zugeteilter/aktiver Kräfte).\n- MANV 100: Untergrenze 6× RTW + 2× NEF (abzüglich bereits zugeteilter/aktiver Kräfte), sofern AAO nicht bereits höher ist.\n\nDifferenzregel: Empfehle nur fehlende Typen/Mengen (z.B. wenn schon 3 RTW disponiert sind, nur +1 RTW).\n\nFührung: Wenn MANV läuft und kein FW_ELW zugeteilt ist, prüfe 1× FW_ELW."
+  },
+  {
+    "meta": "Feuer/Brand bei MANV / Sonderlage",
+    "content": "Trigger-Regel (vereinfacht):\n- Wenn Logs/Funk auf Rauch/Feuer/Evakuierung hindeuten oder Domain=feuerwehr: mindestens 1× FW_HLF zusätzlich prüfen (wenn nicht bereits vor Ort).\n- FW_DLK nur, wenn expliziter Anleiter-/Etagen-/Höhenrettungsbedarf in Logs/Funk genannt ist.\n\nImmer als Differenz (nur fehlende Typen)."
+  }
+]
