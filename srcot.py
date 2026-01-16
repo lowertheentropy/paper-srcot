@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-srcot.py — v.1.0 — Super-lightweight 2-pass "Retrieve → Reflect → Respond" framework
+srcot.py — v.1.1 — Super-lightweight 2-pass "Retrieve → Reflect → Respond" framework
 for local OpenAI-compatible servers (LM Studio, etc.) + optional BM25 RAG
 + optional 1-step "Judge & Self Assessment" extension.
 
@@ -16,6 +16,9 @@ Patch add-ons (minimal):
 - GWT-ish workspace ordering: Environment → Memory → Knowledge → Experiences
 - Evidence discipline: if too few inline citations, one strict rewrite pass
 - Close the loop: if Judge recommends Targeted-Retrieve, run one extra targeted retrieve + revise
+
+- Added: generic summary prioritization in context (summary score + sorting) so that aggregate/overview blocks (totals/diffs/overview) end up “at the top” in the prompt → reduces the model from only summing up individual logs and overlooking totals.
+- Added: generic numeric conflict check + reconcile pass, which automatically forces a revision in case of conflicting numbers (quote both sides + name delta) → prevents silent misjudgments in case of inconsistent sources.
 
 Deps:
   pip install openai rank-bm25 numpy
@@ -217,6 +220,33 @@ CONTEXT (bisher):
 {context}
 """
 
+PROMPT_RECONCILE = """\
+Your answer conflicts with numeric facts in CONTEXT.
+
+Task:
+- Identify the conflicting numeric keys and values.
+- Prefer the most "summary-like" sources for totals (aggregate/overview/diff style blocks),
+  but ALWAYS show the supporting citations for both sides.
+- If a total cannot be attributed to individual logs, state: "delta not attributable from logs".
+- Do NOT invent missing evidence.
+
+Return:
+1) Direct Answer
+2) Reconciliation Notes (conflicts + why you chose the total)
+3) Rationale
+
+CONTEXT:
+{context}
+
+QUESTION:
+{question}
+
+PREVIOUS FINAL:
+{final}
+
+CONFLICTS (key -> values observed):
+{conflicts}
+"""
 
 # -----------------------------
 # Data model
@@ -756,6 +786,35 @@ def render_markdown(res: Dict[str, Any]) -> str:
 
     return "\n".join(out).rstrip() + "\n"
 
+def extract_key_number_pairs(text: str) -> List[Tuple[str, int]]:
+    # catches patterns like "foo: 123", "foo = 123", "foo 123"
+    out = []
+    for m in re.finditer(r"\b([a-zA-Z_][\w\-]{2,})\b\s*(?:[:=]\s*|\s+)(\d{1,9})\b", text or ""):
+        key = m.group(1).lower()
+        val = int(m.group(2))
+        out.append((key, val))
+    return out
+
+def find_numeric_conflicts(context: str) -> Dict[str, List[int]]:
+    pairs = extract_key_number_pairs(context)
+    by_key: Dict[str, set] = {}
+    for k, v in pairs:
+        by_key.setdefault(k, set()).add(v)
+    conflicts = {k: sorted(list(vs)) for k, vs in by_key.items() if len(vs) >= 2}
+    return conflicts
+
+def mine_identifiers(text: str, limit: int = 12) -> List[str]:
+    t = (text or "")
+    ids = []
+    ids += re.findall(r"\b[a-z]{2,}_[a-z0-9_]{2,}\b", t.lower())
+    ids += re.findall(r"#\d{3,}\b", t)
+    # simple de-dupe
+    out = []
+    seen = set()
+    for x in ids:
+        if x not in seen:
+            out.append(x); seen.add(x)
+    return out[:limit]
 
 # -----------------------------
 # Judge
@@ -1022,6 +1081,10 @@ def run_srcot(request: Dict[str, Any]) -> Dict[str, Any]:
     followups_for_query2 = followups[:max(0, query2_max_followups)]
     query2 = " ".join([question] + followups_for_query2).strip()
 
+    # NEW: auto identifiers
+    auto_ids = mine_identifiers(question + "\n" + (draft or ""))
+    query2 = " ".join([question] + followups_for_query2 + auto_ids).strip()
+
     context2, per_corpus2 = build_context(
         indexes, query2, top_k=top_k, per_doc_chars=per_doc_chars, recent_k=recent_k
     )
@@ -1127,6 +1190,21 @@ def run_srcot(request: Dict[str, Any]) -> Dict[str, Any]:
                     "Bitte gezielt nach relevanten SOP-/Leitlinien-Abschnitten suchen oder ärztlich rücksprechen.\n"
                     f"(Controller: {act_type} — {act_value or 'not specified'})"
                 )
+
+                conflicts = find_numeric_conflicts(context2)
+                if conflicts:
+                    rev = chat.chat(
+                        SYSTEM_DEFAULT,
+                        PROMPT_RECONCILE.format(
+                            context=context2,
+                            question=question,
+                            final=final,
+                            conflicts=json.dumps(conflicts, ensure_ascii=False),
+                        ),
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                    )
+                    final = rev.strip() or final
 
     return {
         "final": final,
