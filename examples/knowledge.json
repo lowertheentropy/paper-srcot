@@ -1,0 +1,182 @@
+[
+  {
+    "content": "Blackout-Grundlage: Ein großflächiger Stromausfall betrifft gleichzeitig Kommunikation, Verkehr, kritische Infrastruktur und Versorgungsketten. Einsatzaufkommen steigt oft sprunghaft, Lagebild ist anfangs unvollständig.",
+    "meta": {
+      "title": "Blackout – Grundprinzip",
+      "tags": ["blackout", "lage", "grundlage", "krise"],
+      "nummer": "BO-KNOW-001",
+      "artikel": "Blackout – Grundprinzip"
+    }
+  },
+  {
+    "content": "Kommunikationsausfall: Mobilfunk kann durch Netzauslastung oder fehlende Notstromversorgung ausfallen. Leitstellen müssen mit Degradation rechnen (Funkpriorisierung, alternative Meldewege, Meldekopf/Runner).",
+    "meta": {
+      "title": "Kommunikation – Mobilfunk/Netzüberlast",
+      "tags": ["blackout", "kommunikation", "mobilfunk", "degradation"],
+      "nummer": "BO-KNOW-002",
+      "artikel": "Kommunikation – Mobilfunk/Netzüberlast"
+    }
+  },
+  {
+    "content": "Funkdisziplin im Blackout: Kurze Meldungen, klare Struktur (WER–WO–WAS–BEDARF), Wiederholungen vermeiden, Statusmeldungen priorisieren. Bei Funkknappheit: Sammelmeldungen statt Dauerfunk.",
+    "meta": {
+      "title": "Kommunikation – Funkdisziplin",
+      "tags": ["blackout", "funk", "lage", "priorisierung"],
+      "nummer": "BO-KNOW-003",
+      "artikel": "Kommunikation – Funkdisziplin"
+    }
+  },
+  {
+    "content": "Verkehr: Ausfall von Ampeln führt zu Stau, Kreuzungschaos und erhöhtem Unfallrisiko. Anfahrtszeiten werden unzuverlässig; Umleitungs- und Stauinfos fehlen häufig.",
+    "meta": {
+      "title": "Verkehr – Ampelausfall",
+      "tags": ["blackout", "verkehr", "ampeln", "stau"],
+      "nummer": "BO-KNOW-004",
+      "artikel": "Verkehr – Ampelausfall"
+    }
+  },
+  {
+    "content": "Aufzüge/Technik: Häufige Folge sind Aufzugsnotfälle (eingeschlossene Personen), steckenbleibende Türen, Ausfall von Zugangssystemen/Schließanlagen und defekte Beleuchtung in Treppenhäusern.",
+    "meta": {
+      "title": "Gebäude – Aufzug/Schließsysteme",
+      "tags": ["blackout", "aufzug", "gebäude", "einschluss"],
+      "nummer": "BO-KNOW-005",
+      "artikel": "Gebäude – Aufzug/Schließsysteme"
+    }
+  },
+  {
+    "content": "Medizinische Risiken zuhause: Sauerstoffkonzentratoren, Heimbeatmung, Absaugpumpen, Pflegebetten und Kühlketten für Medikamente können ausfallen. Priorität: vulnerable Personen, Pflegeheime, Dialysebedarf.",
+    "meta": {
+      "title": "Rettungsdienst – Vulnerable Patienten",
+      "tags": ["blackout", "rettungsdienst", "heimbeatmung", "pflege", "dialyse"],
+      "nummer": "BO-KNOW-006",
+      "artikel": "RD – Vulnerable Patienten"
+    }
+  },
+  {
+    "content": "Krankenhäuser: Notstrom stabilisiert Kernbereiche, aber nicht alle Systeme (z.B. Komfort, Teile der IT, Aufzüge, Klima). Engpassrisiko: Treibstoff, Personalwege, Labor/IT, Dokumentation.",
+    "meta": {
+      "title": "Kliniken – Notstrom & Engpässe",
+      "tags": ["blackout", "krankenhaus", "notstrom", "treibstoff", "it"],
+      "nummer": "BO-KNOW-007",
+      "artikel": "Kliniken – Notstrom & Engpässe"
+    }
+  },
+  {
+    "content": "Wasser/Abwasser: Pumpwerke können ausfallen. Folge: niedriger Wasserdruck, Einschränkung Löschwasserversorgung, Hygieneprobleme, Rückstau. Frühzeitig Wasserlage/Versorgungslage abfragen.",
+    "meta": {
+      "title": "Infrastruktur – Wasser/Abwasser",
+      "tags": ["blackout", "wasser", "abwasser", "pumpwerk", "hygiene"],
+      "nummer": "BO-KNOW-008",
+      "artikel": "Infrastruktur – Wasser/Abwasser"
+    }
+  },
+  {
+    "content": "Brände im Blackout: Erhöhtes Risiko durch Kerzen/Notbeleuchtung, Generatoren, unsachgemäße Heizquellen. Zusätzlich: Brandmeldeanlagen können eingeschränkt sein (Störung/Notbetrieb).",
+    "meta": {
+      "title": "Feuerwehr – Brandrisiken",
+      "tags": ["blackout", "feuerwehr", "brand", "generator", "kerzen"],
+      "nummer": "BO-KNOW-009",
+      "artikel": "FW – Brandrisiken"
+    }
+  },
+  {
+    "content": "Sicherheitslage: Dunkelheit, Alarmanlagen-Ausfall und Versorgungsengpässe können zu Konflikten/Plünderungsrisiko führen. Schnittstelle zu Ordnungskräften/Objektschutz einplanen (ohne selbst zu spekulieren).",
+    "meta": {
+      "title": "Sicherheitslage – Degradation",
+      "tags": ["blackout", "sicherheit", "objektschutz", "lagebild"],
+      "nummer": "BO-KNOW-010",
+      "artikel": "Sicherheitslage – Degradation"
+    }
+  },
+  {
+    "content": "Tankstellen/Fuel: Versorgung kann stocken (Pumpen ohne Strom, Kartenzahlung/IT down). Einsatzmittel sollten frühzeitig Kraftstofflage monitoren und Betankungsfenster nutzen.",
+    "meta": {
+      "title": "Logistik – Kraftstoff",
+      "tags": ["blackout", "logistik", "kraftstoff", "tankstelle"],
+      "nummer": "BO-KNOW-011",
+      "artikel": "Logistik – Kraftstoff"
+    }
+  },
+  {
+    "content": "Zahlungsverkehr: Kartenzahlung/Bankautomaten können ausfallen. Folge: Versorgungsstress in Bevölkerung, erhöhte Anfragen bei Hilfsstellen. Kommunikationsstrategie: klare Anlaufstellen nennen.",
+    "meta": {
+      "title": "Bevölkerung – Zahlungsverkehr",
+      "tags": ["blackout", "bevölkerung", "zahlung", "versorgung"],
+      "nummer": "BO-KNOW-012",
+      "artikel": "Bevölkerung – Zahlungsverkehr"
+    }
+  },
+  {
+    "content": "ÖPNV/Schiene: Signal- und Leitsysteme können ausfallen. Folge: Betriebsunterbrechungen, Evakuierungen, viele Rückfragen/Personenansammlungen an Stationen.",
+    "meta": {
+      "title": "Mobilität – ÖPNV/Schiene",
+      "tags": ["blackout", "öpnv", "evakuierung", "menschenmenge"],
+      "nummer": "BO-KNOW-013",
+      "artikel": "Mobilität – ÖPNV/Schiene"
+    }
+  },
+  {
+    "content": "Lageführung: Bei Informationsmangel sind standardisierte Lageupdates entscheidend (Zeit, Ort, Schadensausmaß, Bedarf, nächste Maßnahme). Fokus: Unterdeckung/Überdeckung vermeiden.",
+    "meta": {
+      "title": "Führung – Lageupdates",
+      "tags": ["blackout", "führung", "lageupdate", "koordination"],
+      "nummer": "BO-KNOW-014",
+      "artikel": "Führung – Lageupdates"
+    }
+  },
+  {
+    "content": "Katastrophenschutz-Leuchttürme/Anlaufstellen: Kommunale Anlaufpunkte für Bevölkerung (Info, Notrufweitergabe, ggf. Wärme/Trinkwasser). Bei Ausfall digitaler Kanäle: Hinweissysteme/Wegeleitung wichtig.",
+    "meta": {
+      "title": "Anlaufstellen – Leuchttürme",
+      "tags": ["blackout", "katastrophenschutz", "leuchtturm", "anlaufstelle"],
+      "nummer": "BO-KNOW-015",
+      "artikel": "Anlaufstellen – Leuchttürme"
+    }
+  },
+  {
+    "content": "Notruf-Degradation: Wenn 112/Leitstelle überlastet ist, steigen Mehrfachmeldungen und unklare Lagen. Taktik: Sammelkategorien (Brand, RD, THL), Priorisierung nach Lebensgefahr, klare Rückmeldeschleifen.",
+    "meta": {
+      "title": "Leitstelle – Notrufüberlast",
+      "tags": ["blackout", "leitstelle", "notruf", "priorisierung"],
+      "nummer": "BO-KNOW-016",
+      "artikel": "Leitstelle – Notrufüberlast"
+    }
+  },
+  {
+    "content": "Doku im Blackout: IT kann eingeschränkt sein. Minimale, robuste Dokumentation (Zeit, Einheit, Maßnahme/Ergebnis, Übergabe). Später nachtragen, aber jetzt beweissicher und knapp.",
+    "meta": {
+      "title": "Dokumentation – Minimalprinzip",
+      "tags": ["blackout", "doku", "it-ausfall", "minimal"],
+      "nummer": "BO-KNOW-017",
+      "artikel": "Dokumentation – Minimalprinzip"
+    }
+  },
+  {
+    "content": "Einsatzmuster: In den ersten 30–120 Minuten dominieren Orientierung/Erkundung, danach häufen sich Sekundärfolgen (Unfälle, Aufzüge, medizinische Folgerisiken, Brände). Ressourcenplanung in Wellen denken.",
+    "meta": {
+      "title": "Einsatzdynamik – Wellen",
+      "tags": ["blackout", "dynamik", "sekundärfolgen", "ressourcen"],
+      "nummer": "BO-KNOW-018",
+      "artikel": "Einsatzdynamik – Wellen"
+    }
+  },
+  {
+    "content": "Schnittstelle RD/FW/THL: Blackout ist oft 'mixed'. RD: vulnerable Patienten/Transport, FW/THL: Aufzüge, Verkehr, Brand, technische Hilfe. Führungs-/Koordinationsressourcen früh mitdenken (z.B. ELW).",
+    "meta": {
+      "title": "Schnittstellen – Mixed-Lage",
+      "tags": ["blackout", "rd", "feuerwehr", "thl", "elw"],
+      "nummer": "BO-KNOW-019",
+      "artikel": "Schnittstellen – Mixed-Lage"
+    }
+  },
+  {
+    "content": "Kommunikationshinweis für die KI: Wenn CONTEXT vage ist (z.B. 'unklare Lage', 'Funk n/a'), soll die Empfehlung konservativ sein: Koordination stärken (ELW/NEF je Domain) statt blind eskalieren.",
+    "meta": {
+      "title": "KI-Regel – konservativ bei Funk n/a",
+      "tags": ["blackout", "ki", "funk", "unsicherheit", "koordination"],
+      "nummer": "BO-KNOW-020",
+      "artikel": "KI-Regel – konservativ bei Funk n/a"
+    }
+  }
+]
