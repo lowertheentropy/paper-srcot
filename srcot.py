@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-srcot.py — v.1.1 — Super-lightweight 2-pass "Retrieve → Reflect → Respond" framework
+srcot.py — v.1.3 — Super-lightweight 2-pass "Retrieve → Reflect → Respond" framework
 for local OpenAI-compatible servers (LM Studio, etc.) + optional BM25 RAG
 + optional 1-step "Judge & Self Assessment" extension.
 
@@ -17,8 +17,10 @@ Patch add-ons (minimal):
 - Evidence discipline: if too few inline citations, one strict rewrite pass
 - Close the loop: if Judge recommends Targeted-Retrieve, run one extra targeted retrieve + revise
 
-- Added: generic summary prioritization in context (summary score + sorting) so that aggregate/overview blocks (totals/diffs/overview) end up “at the top” in the prompt → reduces the model from only summing up individual logs and overlooking totals.
-- Added: generic numeric conflict check + reconcile pass, which automatically forces a revision in case of conflicting numbers (quote both sides + name delta) → prevents silent misjudgments in case of inconsistent sources.
+- Added v.1.0: Generic summary prioritization in context (summary score + sorting) so that aggregate/overview blocks (totals/diffs/overview) end up “at the top” in the prompt → reduces the model from only summing up individual logs and overlooking totals.
+- Added v.1.1: Generic numeric conflict check + reconcile pass, which automatically forces a revision in case of conflicting numbers (quote both sides + name delta) → prevents silent misjudgments in case of inconsistent sources.
+- Added v.1.2: Support other LLMs, improved llm output for follow-up system.
+- Added v.1.3: Prompt reflection should abstain from human-asking questions. Rather follow-up the corpora.
 
 Deps:
   pip install openai rank-bm25 numpy
@@ -90,25 +92,55 @@ CONFLICT_MARKERS = [
 ]
 
 # Prompt texts (editable)
-SYSTEM_DEFAULT = "You are a careful assistant. Do not invent facts. If missing, say 'not specified'."
+SYSTEM_DEFAULT = (
+  "You are a careful assistant. "
+  "You MUST follow output format rules exactly. "
+  "If asked to output JSON, output ONLY valid JSON with double quotes. "
+  "No markdown, no code fences, no additional text."
+)
 
 # Workspace-like corpus ordering (GWT-ish)
 CORPUS_ORDER = ["Environment", "Memory", "Knowledge", "Experiences"]
 
 PROMPT1_REFLECT = """\
-You will produce TWO things:
-1) a short draft answer
-2) up to {max_followups} follow-up retrieval questions to improve correctness (if needed)
+Return ONLY a single JSON object. No code fences. No markdown. No extra text.
+
+Schema (must match exactly):
+{{
+  "draft": "string",
+  "followups": ["string", "..."]
+}}
 
 Rules:
-- Use only CONTEXT as data; if something is missing, say 'not specified'.
-- Keep the follow-up questions short and searchable.
-- Output MUST be valid JSON with keys:
-  - "draft": string
-  - "followups": array of strings
+- Use only CONTEXT as data; if missing: 'not specified'.
+- Extract and include any directly available values in the draft BEFORE proposing followups.
+- Followups: up to {max_followups} short, searchable questions.
+- Ask a follow-up ONLY if the value is NOT present in CONTEXT.
+- When creating followups, prefer queries that would retrieve missing info from the existing corpora
+  (Environment for location specific information / Memory for situation; Knowledge for SOP/criteria; Experiences for prior patterns).
+- DO NOT add headings like "Mögliche Follow-up-Fragen". Put them ONLY into followups[].
 
-Before proposing follow-up retrieval questions, scan CONTEXT and extract any directly available values.
-Only ask a follow-up if the value is NOT present in CONTEXT.
+CONTEXT:
+{context}
+
+USER QUESTION:
+{question}
+"""
+
+PROMPT1_REFLECT_RETRY = """\
+Return ONLY a single JSON object. No code fences. No reasoning. No extra text.
+
+Schema (must match exactly):
+{{
+  "draft": "string",
+  "followups": ["string", "..."]
+}}
+
+
+Rules:
+- Use only CONTEXT as data; if missing: 'not specified'.
+- Keep followups short and searchable.
+- Ask a follow-up only if the value is NOT present in CONTEXT.
 
 CONTEXT:
 {context}
@@ -125,8 +157,8 @@ Rules:
 - Every critical statement should include an inline citation key copied from CONTEXT
   (example: [Knowledge:12 SOP], [Memory:?, ...], etc.).
 - Output format:
-  1) Direct Answer (checklist / steps)
-  2) Rationale (why this is the right wording given the sources)
+  1) Direct Answer (checklist / steps) (Markdown Format)
+  2) Rationale (why this is the right wording given the sources) (Markdown Format)
 
 CONTEXT:
 {context}
@@ -146,11 +178,10 @@ Your previous answer did not include sufficient inline citations.
 Rewrite the answer using ONLY CONTEXT as data and include inline citation keys for every actionable step and every critical numeric/value statement.
 If something is missing, write 'not specified' (do NOT guess).
 
-Output format:
+Output format (Markdown Format):
   1) Direct Answer (checklist / steps)
-  2) Current Values (explicitly list current vitals if available, else 'not specified')
-  3) Pre-notification / Handover (e.g., ISBAR if available in CONTEXT)
-  4) Rationale (why this is the right wording given the sources)
+  2) Current Values (e.g. explicitly list current vitals if available, else 'not specified')
+  3) Rationale (why this is the right wording given the sources)
 
 CONTEXT:
 {context}
@@ -341,7 +372,7 @@ def format_hits(hits: List[Tuple[Item, float]], corpus_name: str, per_doc_chars:
         nummer = meta.get("nummer", "?")
         spez = meta.get("spezifikation") or meta.get("artikel") or ""
 
-        # ✅ Einsatz-/Incident-Bezug (für eindeutige Zuordnung)
+        # Einsatz-/Incident-Bezug (für eindeutige Zuordnung)
         einsatz_nr = meta.get("einsatzNr") or meta.get("einsatznr") or meta.get("incidentNr") or meta.get("incident") or ""
         event_id = meta.get("eventId") or meta.get("event_id") or ""
         incident_tag = ""
@@ -467,6 +498,47 @@ class LocalChat:
 # -----------------------------
 # Helpers
 # -----------------------------
+
+def _strip_code_fences(text: str) -> str:
+    """
+    Remove common ```json ... ``` fences (and generic ``` ... ```).
+    Keeps inner content.
+    """
+    s = (text or "").strip()
+    # ```json ... ```
+    s = re.sub(r"^\s*```(?:json)?\s*", "", s, flags=re.I)
+    s = re.sub(r"\s*```\s*$", "", s)
+    return s.strip()
+
+
+def _parse_reflect_output(text: str) -> Tuple[Dict[str, Any], bool, str]:
+    """
+    Parse Pass-1 output for {"draft":..., "followups":[...]}.
+    Returns: (parsed, ok, mode)
+      ok=True only if we successfully parsed a JSON object with required keys.
+      mode: direct | extracted | fallback
+    """
+    s = _strip_code_fences(text)
+
+    # 1) direct JSON
+    try:
+        obj = json.loads(s)
+        if isinstance(obj, dict) and "draft" in obj and "followups" in obj:
+            return obj, True, "direct"
+    except Exception:
+        pass
+
+    # 2) extract first {...} substring and parse
+    for m in re.finditer(r"\{.*?\}", s, flags=re.S):
+        try:
+            obj = json.loads(m.group(0))
+            if isinstance(obj, dict) and "draft" in obj and "followups" in obj:
+                return obj, True, "extracted"
+        except Exception:
+            continue
+
+    # 3) fallback
+    return {"draft": (text or "").strip(), "followups": []}, False, "fallback"
 
 def _safe_json_parse(text: str) -> Dict[str, Any]:
     """
@@ -1067,10 +1139,37 @@ def run_srcot(request: Dict[str, Any]) -> Dict[str, Any]:
     pass1_reasoning = out1_full.get("reasoning", "") or ""
     pass1_raw_response = out1_full.get("raw", {}) or {}
 
-    parsed = _safe_json_parse(out1_text)
+    parsed, pass1_json_ok, pass1_parse_mode = _parse_reflect_output(out1_text)
+    pass1_retries = 0
+
+    # Retry once if Pass-1 JSON is not compliant
+    if not pass1_json_ok:
+        pass1_retries = 1
+        p1_retry = PROMPT1_REFLECT_RETRY.format(
+            context=context1,
+            question=question,
+        )
+        out1b_full = chat.chat_full(SYSTEM_DEFAULT, p1_retry, temperature=temperature, max_tokens=max_tokens)
+        out1b_text = (out1b_full.get("text", "") or "").strip()
+
+        parsed2, ok2, mode2 = _parse_reflect_output(out1b_text)
+        if ok2:
+            parsed = parsed2
+            pass1_json_ok = True
+            pass1_parse_mode = f"retry:{mode2}"
+            # keep raw history (optional but useful)
+            pass1_raw_response = {"initial": pass1_raw_response, "retry": out1b_full.get("raw", {}) or {}}
+            pass1_reasoning = (pass1_reasoning + "\n\n" + (out1b_full.get("reasoning", "") or "")).strip()
+            out1_text = out1b_text
+        else:
+            pass1_parse_mode = f"fallback:{pass1_parse_mode}"
+
     draft = str(parsed.get("draft", "")).strip()
 
     followups = parsed.get("followups") or []
+    if not isinstance(followups, list):
+        followups = []
+    followups = [str(x).strip() for x in followups if str(x).strip()][:max_followups]
     if not isinstance(followups, list):
         followups = []
     followups = [str(x).strip() for x in followups if str(x).strip()][:max_followups]
@@ -1226,6 +1325,10 @@ def run_srcot(request: Dict[str, Any]) -> Dict[str, Any]:
             "base_url": base_url,
             "query2": query2,
             "question": question,
+            "pass1_json_ok": bool(pass1_json_ok),
+            "pass1_retries": int(pass1_retries),
+            "pass1_followups_n": int(len(followups)),
+            "pass1_parse_mode": str(pass1_parse_mode),
         },
     }
 
