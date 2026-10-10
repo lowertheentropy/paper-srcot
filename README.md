@@ -6,6 +6,10 @@ It’s designed for **offline / edge** setups: small dependency footprint, plain
 
 > **Compatibility note:** This version is optimized for **munich-sim** and **munich-blackout-sim** (corpora formats + conventions).
 
+## Selected synthetic research reports
+
+The [EMS and Munich-Sim case artifacts](artifacts/frontiers-cases/README.md) provide public, provenance-documented exports of the two illustrations used in the SRCoT brief report. Generated outputs are preserved without correction; retrieved source passages with unresolved redistribution rights are excluded. These are not clinical or operational guidance, and source markers or Judge coverage do not establish correctness. See the artifact README for the crossed EMS filenames and historical-run limitations.
+
 ---
 
 ## Key idea (2-pass)

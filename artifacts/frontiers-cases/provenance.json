@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "export_date": "2026-10-10",
+  "all_case_scenarios_synthetic": true,
+  "historical_code_revision_not_established": true,
+  "full_retrieved_corpora_not_redistributed": true,
+  "cases": {
+    "ems-report-2": {
+      "original_report_filename": "report_srcot_run_2.md",
+      "original_report_sha256": "f53c385220f06e91d833566cb5e200148dcea74a0fabad2d5a82013526be990f",
+      "original_result_filename": "result_srcot_run_3.json",
+      "original_result_sha256": "cfa49a1ae04a85f86a0eacd7da76e186e3d9222faf2ae82b7e82adbdda7bf6d8",
+      "report_result_consistency": {
+        "final_text_matches_after_trimming_outer_whitespace": true,
+        "draft_text_matches_after_trimming_outer_whitespace": true,
+        "judge_metrics_match": true
+      },
+      "model_identifier_in_saved_result": "gpt-oss-120b",
+      "filename_pairing_note": "report_srcot_run_2.md matches result_srcot_run_3.json by content. The numeric filename suffixes are crossed; result_srcot_run_2.json is a different saved output. Original filename stems are retained in these public exports.",
+      "request_limitation": "The available local request.json names gpt-oss-20b, whereas the saved report and its matching result name gpt-oss-120b. It is not exported as the original run request."
+    },
+    "munich-sim-000053": {
+      "original_report_filename": "report.md",
+      "original_report_sha256": "aaab24121b8bc463f201d4c212506fd6a78cf775bff1119adacb957b8976e20a",
+      "original_result_filename": "result.json",
+      "original_result_sha256": "e6c7b8bf20c15e012b70244bc62e488cddad08e05f1d79410e6d6ba061b64b7b",
+      "report_result_consistency": {
+        "final_text_matches_after_trimming_outer_whitespace": true,
+        "draft_text_matches_after_trimming_outer_whitespace": true,
+        "judge_metrics_match": true
+      },
+      "model_identifier_in_saved_result": "gpt-oss-120b",
+      "original_request_sha256": "7363791d7d0f29abb22c24c3de4e8519dfb1b83ff4d8ba56c06dc99243dc38eb",
+      "run_id": "srcot_1768397359157_c7f6a1"
+    }
+  },
+  "public_export_sha256": {
+    "ems-report-2/report_srcot_run_2.public.md": "d60756da84fa07003f6c1bb76c06c898c42a02b75a801d50f2e2364bafd0d7d3",
+    "ems-report-2/result_srcot_run_3.public.json": "ddb7d38d2a597cc3040a7f817d7e1770054135c4b349b9a87bf48ed2ed5753ab",
+    "munich-sim-000053/report.public.md": "0db528b9a19412459bbbc22c7eca06b3c77c914f04ae69bddfb701af41de2a03",
+    "munich-sim-000053/result.public.json": "133567578a671b398ddd7a5cd41ffaa2fd911d178db71b30ef301cf1f8d37ef3",
+    "munich-sim-000053/request.public.json": "5a87de640fc4de2254de7ecf8a87eb9a5b3902b94d2f19f283e061a255f57a9a"
+  }
+}

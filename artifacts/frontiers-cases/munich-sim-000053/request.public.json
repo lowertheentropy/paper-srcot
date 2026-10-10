@@ -1,0 +1,4017 @@
+{
+  "question": "Dokumentation (Simulation): Erstelle eine detaillierte, sachliche Einsatzdokumentation (Fließtext + Stichpunkte). Struktur: Lage beim Eintreffen, Maßnahmen/Verlauf (nur aus Logs), aktuelle Werte (falls vorhanden), Transport/Übergabe (falls vorhanden). Keine Dosierungs-/Therapieanleitungen, nur Zusammenfassung dessen, was in Logs/Context steht. Wortlaut z.B. (Feuerwehr) Es brannte ..., Patient vorgefunden (Rettungsdienst) ...",
+  "llm": {
+    "base_url": "http://localhost:1234/v1",
+    "model": "gpt-oss-120b",
+    "temperature": 0.2,
+    "max_tokens": 131072
+  },
+  "retrieval": {
+    "top_k": {
+      "Knowledge": 100,
+      "Memory": 200,
+      "Experiences": 100,
+      "Environment": 100
+    },
+    "recent_k": {
+      "Memory": 100,
+      "Environment": 200
+    },
+    "per_doc_chars": 800
+  },
+  "corpora": {
+    "Knowledge": null,
+    "Experiences": null,
+    "Environment": {
+      "items": [
+        {
+          "content": "Gültige unitTypes (müssen exakt so geschrieben werden):\n- RTW\n- NEF\n- FW_LF\n- FW_HLF\n- FW_DLK\n- FW_GW\n- FW_ELW\n- FW_GW_SAN\n\nHinweis: Wenn du Einheiten empfiehlst, nutze ausschließlich diese unitTypes. Keine neuen/anderen Namen erfinden.",
+          "meta": "Ressourcen-Katalog"
+        },
+        {
+          "content": "Beispiele Callsigns pro unitType (Auswahl):\n- RTW: RK M 1/83/1, RK M 2/83/1, RK M 3/83/1\n- NEF: RK M 1/82/1, RK M 1/82/2, RK M 2/82/1\n- FW_LF: FL M 1/40/1, FL M 2/40/1, FL M 3/40/1\n- FW_HLF: FL M 1/46/1, FL M 2/46/1, FL M 3/46/1\n- FW_DLK: FL M 1/30/1, FL M 2/30/1, FL M 3/30/1\n- FW_GW: FL M 1/59/1, FL M 2/59/1, FL M 3/59/1\n- FW_ELW: FL M 1/11/1, FL M 2/11/1\n- FW_GW_SAN: FL M 1/59/50, FL M 2/59/50\n\nWichtig: Callsigns sind nur Identifikatoren. Für Empfehlungen gibst du unitTypes zurück.",
+          "meta": "Callsign-Beispiele"
+        },
+        {
+          "content": "Wachen/Stationen:\n- st_rd_zentrum: RD Wache Zentrum (48.137, 11.575)\n- st_rd_west: RD Wache West (48.148, 11.530)\n- st_rd_ost: RD Wache Ost (48.128, 11.630)\n- st_fw_1: FW Wache 1 (48.135, 11.570)\n- st_fw_2: FW Wache 2 (48.155, 11.590)\n- st_fw_3: FW Wache 3 (48.120, 11.560)",
+          "meta": "Stationen"
+        },
+        {
+          "content": "Krankenhäuser (sim):\n- kh_klinikum: Klinikum (sim) (48.151, 11.590)\n- kh_sued: KH Süd (sim) (48.110, 11.560)\n- kh_west: KH West (sim) (48.146, 11.515)\n- kh_ost: KH Ost (sim) (48.125, 11.665)\n- kh_nord: KH Nord (sim) (48.190, 11.570)",
+          "meta": "Krankenhäuser"
+        },
+        {
+          "content": "AAO (mechanischer Vorschlag) wird vom System je Einsatz erzeugt. Für 'Unterdeckung' gilt:\n- Wenn ein Einsatz unbeschickt ist (Assigned: none) UND AAO-Vorschlag existiert, ist das in der Regel Unterdeckung.\n- Wenn bereits Einheiten vor Ort/zugeteilt sind, prüfe anhand Logs/Funk, ob AAO vollständig ist oder Nachforderungen nötig sind.\n- Empfehlungen sollen sich an AAO + Lageentwicklung (Logs/Funk) orientieren.",
+          "meta": "AAO-Logik"
+        },
+        {
+          "content": "Wenn nach 'Unterdeckung' oder 'KI Empfehlung' gefragt wird, starte mit 'Direct Answer' und gib als erstes ein JSON-Objekt (eine Zeile) im Schema:\n{ \"unitTypes\": [\"RTW\"], \"reason\": \"kurz\", \"confidence\": 0.0 }\nDanach kurze Begründung anhand CONTEXT (Logs/Funk/AAO).",
+          "meta": "UI-Ausgabeformat"
+        },
+        {
+          "content": "Einsatz-Overview: #000053 | Wohnungsbrand – Person vermisst | Domain=feuerwehr | Prio=1\nOrt: Adlschalkweg 16, 80995 München, Deutschland\nLage: In einem Mehrfamilienhaus in der Müllerstraße kam es zu einem Wohnungsbrand. Starke Rauchentwicklung sorgt dafür, dass Nachbarn alarmiert haben und berichten, dass ein Bewohner möglicherweise noch in der Wohnung ist.\nTypicalLocation: wohnung\nErstellt: 2026-01-14T12:26:13.159Z\nAssigned: FL M 2/46/1(FW_HLF) S1, FL M 2/30/1(FW_DLK) S1, FL M 2/11/1(FW_ELW) S1, RK M 1/83/4(RTW) S1, RK M 1/82/1(NEF) S1, RK M 2/83/1(RTW) S1, RK M 2/83/2(RTW) S1, RK M 2/83/3(RTW) S1, FL M 1/59/50(FW_GW_SAN) S1, FL M 1/11/1(FW_ELW) S1, RK M 2/83/4(RTW) S1, FL M 2/46/2(FW_HLF) S1, RK M 3/82/1(NEF) S1\nAAO-Vorschlag (mechanisch): [\"FW_HLF\",\"FW_DLK\",\"FW_ELW\"]\nAktive Missionen: none",
+          "meta": "Einsatzdetails"
+        },
+        {
+          "content": "Freie Fahrzeuge nach Typ:\n- RTW: RK M 1/83/1, RK M 1/83/2, RK M 1/83/3, RK M 2/83/1, RK M 2/83/2, RK M 2/83/3, RK M 3/83/1, RK M 3/83/2, RK M 3/83/3, RK M 1/83/4, RK M 2/83/4, RK M 3/83/4\n- NEF: RK M 1/82/1, RK M 1/82/2, RK M 2/82/1, RK M 2/82/2, RK M 3/82/1\n- FW_LF: FL M 1/40/1, FL M 1/40/2, FL M 2/40/1, FL M 2/40/2, FL M 3/40/1, FL M 3/40/2\n- FW_HLF: FL M 1/46/1, FL M 1/46/2, FL M 2/46/1, FL M 2/46/2, FL M 3/46/1, FL M 3/46/2\n- FW_DLK: FL M 1/30/1, FL M 1/30/2, FL M 2/30/1, FL M 3/30/1\n- FW_GW: FL M 1/59/1, FL M 2/59/1, FL M 3/59/1\n- FW_ELW: FL M 1/11/1, FL M 2/11/1\n- FW_GW_SAN: FL M 1/59/50, FL M 2/59/50",
+          "meta": "Ressourcen-Frei"
+        },
+        {
+          "content": "Letzte Logs (chronologisch, letzte 60):\n#000053 | 2026-01-14T13:07:51.636Z | FL M 1/59/50: wieder frei (Status 1)\n#000053 | 2026-01-14T13:07:51.636Z | FL M 1/59/50: Materialverbrauch nach Wohnungsbrand-Einsatz mit vereinzelten Gerätedefekten.\n#000053 | 2026-01-14T13:07:51.636Z | FL M 1/59/50: Gerätecheck: dev_generator:defekt, dev_triage_kit:ok\n#000053 | 2026-01-14T13:07:51.636Z | FL M 1/59/50: Materialverbrauch: con_gloves_nitrile×15, con_masks_surgical×10, con_ffp2×5, con_gauze×20, con_bandage_roll×5, con_trauma_dressing×3, con_blankets×10, con_marking_tape×1\n#000053 | 2026-01-14T13:07:09.939Z | RK M 3/82/1: wieder frei (Status 1)\n#000053 | 2026-01-14T13:07:09.939Z | RK M 3/82/1: Einsatz erfolgreich abgeschlossen, mehrere Verbrauchsmaterialien verwendet.\n#000053 | 2026-01-14T13:07:09.939Z | RK M 3/82/1: Materialverbrauch: con_gloves_nitrile×8, con_hand_disinfectant×100, con_ecg_electrodes×5, con_iv_cannula_mix×2, con_syringes_mix×4, con_masks_surgical×3, con_oxygen_mask×2, con_airway_disposables×2\n#000053 | 2026-01-14T13:06:56.433Z | FL M 2/46/2: wieder frei (Status 1)\n#000053 | 2026-01-14T13:06:56.433Z | FL M 2/46/2: Ein SCBA-Set hatte Dichtungsprobleme, andere Materialien wurden für den Einsatz benötigt.\n#000053 | 2026-01-14T13:06:56.433Z | FL M 2/46/2: Gerätecheck: dev_scba_set:defekt\n#000053 | 2026-01-14T13:06:56.433Z | FL M 2/46/2: Materialverbrauch: con_gloves_work×3, con_fire_extinguisher_set×1, con_fuel_mix×500, con_marking_tape×2, con_sorbent_pads×10\n#000053 | 2026-01-14T13:06:39.702Z | FL M 1/11/1: wieder frei (Status 1)\n#000053 | 2026-01-14T13:06:39.702Z | FL M 1/11/1: Einsatz erfolgreich beendet, jedoch Kamera beschädigt.\n#000053 | 2026-01-14T13:06:39.702Z | FL M 1/11/1: Gerätecheck: dev_camera:defekt, dev_router:ok\n#000053 | 2026-01-14T13:06:39.702Z | FL M 1/11/1: Materialverbrauch: con_paper×5, con_ink×1, con_marker_pens×3, con_hand_disinfectant×100, con_surface_wipes×10\n#000053 | 2026-01-14T13:06:18.187Z | FL M 1/59/50: Rückfahrt zur Wache, Einsatz beendet, Informationen zur vermissten Person sind weiterhin unklar.\n#000053 | 2026-01-14T13:06:16.700Z | FL M 1/59/50: Rückfahrt zur Wache\n#000053 | 2026-01-14T13:05:32.858Z | FL M 2/46/2: Rückfahrt zur Wache, Einsatz abgeschlossen, Informationen zur vermissten Person liegen nicht vor.\n#000053 | 2026-01-14T13:05:31.535Z | FL M 2/46/2: Rückfahrt zur Wache\n#000053 | 2026-01-14T13:05:26.682Z | RK M 3/82/1: Rückfahrt zur Wache, Einsatz für RK M 3/82/1 beendet, Meldung über vermisste Person bleibt bestehen.\n#000053 | 2026-01-14T13:05:25.009Z | RK M 3/82/1: Rückfahrt zur Wache\n#000053 | 2026-01-14T13:05:07.457Z | FL M 1/11/1: Rückfahrt zur Wache, Einsatz beendet, Meldung über vermisste Person bleibt bestehen, weitere Informationen nicht verfügbar.\n#000053 | 2026-01-14T13:05:06.191Z | FL M 1/11/1: Rückfahrt zur Wache\n#000053 | 2026-01-14T13:05:05.994Z | RK M 2/83/1: wieder frei (Status 1)\n#000053 | 2026-01-14T13:05:05.994Z | RK M 2/83/1: Verbrauchte Materialien während des Einsatzes; ein Gerät defekt.\n#000053 | 2026-01-14T13:05:05.994Z | RK M 2/83/1: Gerätecheck: dev_monitor_defib:ok, dev_stretcher:defekt\n#000053 | 2026-01-14T13:05:05.994Z | RK M 2/83/1: Materialverbrauch: con_gloves_nitrile×10, con_masks_surgical×5, con_gauze×15, con_trauma_dressing×8, con_iv_cannula_mix×3, con_oxygen_mask×2, con_nasal_cannula×1\n#000053 | 2026-01-14T13:04:54.149Z | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) GW San Sichtung abgeschlossen. Tatsächlich 4 Gelb, 2 Rot, 1 Atemschutznotfall transportiert.\n#000053 | 2026-01-14T13:04:33.384Z | RK M 2/83/4: wieder frei (Status 1)\n#000053 | 2026-01-14T13:04:33.384Z | RK M 2/83/4: Verbrauchte Materialien aufgrund einer intensiven Betreuung des Patienten während des Wohnungsbrands.\n#000053 | 2026-01-14T13:04:33.384Z | RK M 2/83/4: Gerätecheck: dev_stretcher:defekt\n#000053 | 2026-01-14T13:04:33.384Z | RK M 2/83/4: Materialverbrauch: con_gloves_nitrile×6, con_masks_surgical×4, con_hand_disinfectant×200, con_gauze×10, con_bandage_roll×5, con_trauma_dressing×2, con_oxygen_mask×1\n#000053 | 2026-01-14T13:04:29.984Z | FL M 2/46/1: wieder frei (Status 1)\n#000053 | 2026-01-14T13:04:29.984Z | FL M 2/46/1: Während des Einsatzes wurden Materialien benötigt, insbesondere zur Brandbekämpfung und für die Sicherheit der Einsatzkräfte.\n#000053 | 2026-01-14T13:04:29.984Z | FL M 2/46/1: Gerätecheck: dev_scba_set:defekt, dev_generator:ok\n#000053 | 2026-01-14T13:04:29.984Z | FL M 2/46/1: Materialverbrauch: con_absorbent×10, con_gloves_work×2, con_marking_tape×2, con_battery_pack×4, con_fuel_mix×500, con_cutting_discs×3\n#000053 | 2026-01-14T13:04:23.175Z | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) 1 Person EX, vermutlich vermisste Person, Übergabe an Pol. Einsatzende.\n#000053 | 2026-01-14T13:03:57.434Z | RK M 2/83/1: Rückfahrt zur Wache, Einsatz für RK M 2/83/1 beendet, Meldung über vermisste Person bleibt bestehen.\n#000053 | 2026-01-14T13:03:55.935Z | RK M 2/83/1: Rückfahrt zur Wache\n#000053 | 2026-01-14T13:03:53.001Z | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Feuer ist aus, Brandrauch entfernt. DLK entlassen. HLF zur Lüftung, Rauchgas - im Einsatz gewesen 2 C Rohr.\n#000053 | 2026-01-14T13:03:24.905Z | RK M 2/83/4: Rückfahrt zur Wache, Einsatz beendet, Meldung über vermisste Person bleibt bestehen, weitere Informationen nicht verfügbar.\n#000053 | 2026-01-14T13:03:23.563Z | RK M 2/83/4: Rückfahrt zur Wache\n#000053 | 2026-01-14T13:03:22.088Z | FL M 2/30/1: wieder frei (Status 1)\n#000053 | 2026-01-14T13:03:22.088Z | FL M 2/30/1: Verbrauchte Materialien aufgrund von Brandbekämpfung und Sicherungsmaßnahmen.\n#000053 | 2026-01-14T13:03:22.088Z | FL M 2/30/1: Gerätecheck: dev_first_aid_kit:defekt\n#000053 | 2026-01-14T13:03:22.088Z | FL M 2/30/1: Materialverbrauch: con_marking_tape×2, con_light_sticks×5, con_gloves_work×3, con_rope_protection×2, con_disposable_hoods×2, con_surface_wipes×15\n#000053 | 2026-01-14T13:03:05.906Z | FL M 2/46/1: Rückfahrt zur Wache, Meldung über vermisste Person bleibt bestehen, keine weiteren Informationen verfügbar.\n#000053 | 2026-01-14T13:03:04.486Z | FL M 2/46/1: Rückfahrt zur Wache\n#000053 | 2026-01-14T13:02:47.917Z | RK M 3/82/1: Rückfahrt zur Wache, Meldung über vermisste Person bleibt bestehen, weitere Informationen stehen nicht zur Verfügung.\n#000053 | 2026-01-14T13:02:46.801Z | RK M 2/83/2: wieder frei (Status 1)\n#000053 | 2026-01-14T13:02:46.801Z | RK M 2/83/2: Materialverbrauch für Einsatz bei Wohnungsbrand mit vermisster Person.\n#000053 | 2026-01-14T13:02:46.801Z | RK M 2/83/2: Materialverbrauch: con_gloves_nitrile×10, con_masks_surgical×5, con_hand_disinfectant×200, con_surface_wipes×15, con_gauze×20, con_bandage_roll×10, con_trauma_dressing×5, con_spo2_disposable×3, con_iv_cannula_mix×5, con_oxygen_mask×2\n#000053 | 2026-01-14T13:02:40.395Z | RK M 3/82/1: Status 1, wieder einsatzbereit, Meldung über vermisste Person bleibt bestehen.\n#000053 | 2026-01-14T13:02:36.214Z | RK M 3/82/1: Status 1, Rückfahrt zur Wache abgeschlossen, Meldung über vermisste Person bleibt bestehen.\n#000053 | 2026-01-14T13:02:32.633Z | RK M 3/82/1: Rückfahrt zur Wache, Einsatz für RK M 3/82/1 beendet, Meldung über vermisste Person bleibt bestehen.\n#000053 | 2026-01-14T13:02:28.603Z | RK M 3/82/1: Rückfahrt zur Wache, Einsatz beendet, keine weiteren Informationen verfügbar.\n#000053 | 2026-01-14T13:02:24.719Z | RK M 3/82/1: Rückfahrt zur Wache, Einsatz beendet, keine weiteren Informationen verfügbar.\n#000053 | 2026-01-14T13:02:21.353Z | RK M 3/82/1: Patientenübergabe im Krankenhaus erfolgt, GCS 9, stabile Vitalzeichen, Atemnot persisten, Werte: n/a.\n#000053 | 2026-01-14T13:02:20.774Z | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) RTW transportiert u.a. Patienten + Atemschutznotfall, verunfallter Feuerwehrangehöriger - keine weiteren RTWs benötigt\n#000053 | 2026-01-14T13:02:17.990Z | RK M 3/82/1: Patient wird mit GCS 9, stabilen Vitalzeichen und Atemnot (AF 28) ins Krankenhaus transportiert. Weitere Werte: n/a.",
+          "meta": "Logs"
+        },
+        {
+          "content": "Letzter Funkverkehr (📻, letzte 80):\n#000053 | 2026-01-14T12:29:10.608Z | 📻 FL M 2/11/1: Suche nach vermisster Person in der Wohnung wird fortgesetzt. Raucheinwirkung bleibt stark, Sichtverhältnisse weiterhin stark eingeschränkt.\n#000053 | 2026-01-14T12:30:27.260Z | 📻 RK M 1/82/1: Sicht weiterhin stark eingeschränkt, Atemnot bei Einsatzkraft anhält. Suche nach vermisster Person wird intensiv fortgesetzt.\n#000053 | 2026-01-14T12:32:49.487Z | 📻 RK M 2/83/1: Anfahrt zur Einsatzstelle Adlschalkweg 16, Rauchentwicklung stark. ETA unbestimmt, Verkehrbehindernisse durch Einsatzlage. Weiteres folgt.\n#000053 | 2026-01-14T12:41:29.068Z | 📻 RK M 2/83/1: Patient nicht auffindbar, Situation unverändert. Atemnot bei Einsatzkraft, weitere Suche nach vermisster Person läuft. Werte: n/a, weitere Unterstützung angefragt.\n#000053 | 2026-01-14T12:43:30.017Z | 📻 RK M 2/83/1: Suchoperation nach vermisster Person wird fortgesetzt. Atemnot bei der Einsatzkraft, Puls 125, Atemfrequenz 28. Werte werden aktuell erfasst.\n#000053 | 2026-01-14T12:46:00.772Z | 📻 RK M 2/83/1: Suche nach vermisster Person wird fortgesetzt. Atemnot bei Einsatzkraft, Puls 125, Atemfrequenz 29. Werte werden aktuell erfasst.\n#000053 | 2026-01-14T12:49:12.524Z | 📻 FL M 1/59/50: FL M 1/59/50 in Anfahrt, ETA 1 Minute. Bereite Empfang für Unterstützung bei der Personensuche vor. Details zur Lage sind bekannt.",
+          "meta": "Funkverkehr"
+        }
+      ]
+    },
+    "Memory": {
+      "items": [
+        {
+          "content": "FL M 2/46/1: disponiert (FW_HLF)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/30/1: disponiert (FW_DLK)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/11/1: disponiert (FW_ELW)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/83/4: disponiert (RTW)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/82/1: disponiert (NEF)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Anfahrt zum Wohnungsbrand in der Müllerstraße, ETA 5 Minuten, starke Rauchentwicklung gemeldet, Person vermisst.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "FL M 2/30/1: Anfahrt zum Wohnungsbrand in der Müllerstraße, ETA 6 Minuten, starke Rauchentwicklung bestätigt, Person möglicherweise in der Wohnung.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "FL M 2/11/1: Anfahrt zum Wohnungsbrand in der Müllerstraße, ETA 7 Minuten, starke Rauchentwicklung, Person möglicherweise in der Wohnung.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "📻 FL M 2/11/1: Anfahrt zum Wohnungsbrand Adlschalkweg 16, ETA 7 Minuten. Starke Rauchentwicklung bestätigt, Person weiterhin vermisst.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/83/4: Anfahrt zum Wohnungsbrand in der Müllerstraße, ETA 5 Minuten, starke Rauchentwicklung, Person vermisst.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "RK M 1/82/1: Anfahrt zum Wohnungsbrand in der Müllerstraße, ETA 4 Minuten, starke Rauchentwicklung, Person möglicherweise in der Wohnung.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "FL M 2/46/1: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/11/1: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Rauchentwicklung stark, Personenrettung eingeleitet, erste Erkundungen der betroffenen Wohnung laufen.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Rauchentwicklung stark, erste Erkundung der betroffenen Wohnung läuft, Person weiterhin vermisst.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "📻 FL M 2/11/1: Erste Erkundung der betroffenen Wohnung abgeschlossen, keine Auffindung der vermissten Person. Suche wird fortgesetzt, mehrere Löschtrupps im Einsatz.",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Rauchentwicklung stark, erste Erkundungen der Wohnung laufen weiter, keine Sicht auf die vermisste Person, Suche wird intensiviert.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Mehrere Löschtrupps setzen die Suche nach der vermissten Person in der betroffenen Wohnung fort, Einsatz dauert an.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/83/4: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Rauchentwicklung stark, Suche nach vermisster Person in der Wohnung wird intensiviert, Einsatzkräfte weiterhin im Raum.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/11/1: Erste Suchmaßnahmen in der betroffenen Wohnung laufen, mehrere Löschtrupps unterstützen, Person weiterhin vermisst.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/83/4: Vor Ort, erste Erkundung abgeschlossen, keine Auffindung der vermissten Person, weitere Maßnahmen werden koordiniert.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Rauchentwicklung stark, Erkundungen der betroffenen Wohnung laufen, vermisste Person weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW meldet Brandausbreitung auf benachbarte Wohnung durch Explosion. Erhöhung der Einsatzsstelle auf MANV 50, Patienten min. Lage auf Sicht: 5 Gelb, 1 Rot, 3 Grün",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "FL M 2/46/1: Rauchentwicklung weiterhin stark, Suche nach der vermissten Person läuft, Einsatzkräfte im Innenangriff, Sicht weiterhin eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Rauchentwicklung weiterhin stark, persönliche Suche in der betroffenen Wohnung wird fortgesetzt, vermisste Person weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "📻 FL M 2/11/1: Vor Ort: Suche nach der vermissten Person in der betroffenen Wohnung wird intensiv fortgeführt. Unterstützung durch weitere Löschtrupps erfolgt.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/83/4: Vor Ort: Pat. unauffindbar, starker Rauch, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Maßnahmen werden koordiniert.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Rauchentwicklung stark, aktuelle Suche nach vermisster Person in der betroffenen Wohnung wird fortgesetzt, Sicht weiterhin stark eingeschrän",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/82/1: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/82/1: Eingetroffen, erste Erkundung der betroffenen Wohnung läuft, Rauchentwicklung stark, Sicht stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Rauchentwicklung weiterhin stark, Suche nach vermisster Person wird unter erweiterten Maßnahmen fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Rauchentwicklung stark, persönliche Suche in der betroffenen Wohnung wird fortgesetzt, vermisste Person weiterhin unauffindbar.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/83/4: Vor Ort: Patient weiterhin unauffindbar, starker Rauch, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Maßnahmen werden koordiniert.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Rauchentwicklung stark, Suche nach vermisster Person in der betroffenen Wohnung wird fortgesetzt, Sicht weiterhin stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Wohnung in Vollbrand, Hausflur verraucht. Einsatz 2. C Rohr + Menschenrettung eingeleitet.",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 1/82/1: Patient nicht aufgefunden, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, weitere Maßnahmen in Planung.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Rauchentwicklung weiterhin stark, Suchmaßnahmen in der betroffenen Wohnung werden unter erschwerten Bedingungen fortgesetzt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Rauchentwicklung stark, persönliche Suche in der betroffenen Wohnung wird fortgesetzt, vermisste Person weiterhin unauffindbar.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/83/4: Vor Ort, keine Auffindung der vermissten Person, starker Rauch, Puls 120, Atemfrequenz 28, weitere Maßnahmen werden koordiniert.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Rauchentwicklung bleibt stark, Suche nach vermisster Person in der Wohnung wird unter erschwerten Bedingungen fortgesetzt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/82/1: Patient nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Maßnahmen im Fortgang.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Rauchentwicklung weiterhin stark, Suche nach vermisster Person wird intensiv fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Rauchentwicklung weiterhin stark, Suche nach vermisster Person in der betroffenen Wohnung wird intensiv fortgesetzt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/83/4: Vor Ort: Person weiterhin unauffindbar, starker Rauch, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Maßnahmen werden fortgeführt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Aktuelle Suche nach der vermissten Person in der Wohnung wird unter extremen Bedingungen fortgesetzt, Sicht weiterhin stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/82/1: Patient weiterhin unauffindbar, starke Rauchentwicklung, Einsatzkräfte kämpfen mit Atemnot, Puls 120, Atemfrequenz 28, Maßnahmen im Fortgang",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Rauchentwicklung weiterhin stark, Suche nach vermisster Person wird durch gezielte Einsätze in der Wohnung fortgesetzt, Sicht stark eingesch",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Rauchentwicklung weiter stark, Suche nach vermisster Person in der betroffenen Wohnung wird fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "📻 FL M 2/11/1: Suche nach vermisster Person in der Wohnung wird fortgesetzt. Raucheinwirkung bleibt stark, Sichtverhältnisse weiterhin stark eingeschränkt.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/83/4: Patient weiterhin unauffindbar, starker Rauch, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, weitere Maßnahmen laufen.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Suche nach vermisster Person in der betroffenen Wohnung wird unter extremen Bedingungen fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/82/1: Vor Ort: Starke Rauchentwicklung, schwierige Sichtverhältnisse, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Maßnahmen in Planung.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Rauchentwicklung weiterhin stark, intensive Suche nach vermisster Person in der Wohnung wird unter extremen Bedingungen fortgesetzt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Rauchentwicklung bleibt stark, Suche nach vermisster Person in der betroffenen Wohnung wird intensiv fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/83/4: Vor Ort: Vermisste Person weiterhin unauffindbar, starker Rauch, Puls 120, Atemfrequenz 28, Einsatzkräfte sind im Einsatz.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Rauchentwicklung bleibt weiterhin stark, Suche nach der vermissten Person in der Wohnung wird unter extremen Bedingungen fortgesetzt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/82/1: Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, starke Rauchentwicklung weiterhin, Suche nach Person läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Intensive Suche nach vermisster Person wird fortgesetzt, Sicht aufgrund der Rauchentwicklung weiter stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Rauchentwicklung bleibt stark, Suche nach vermisster Person in der betroffenen Wohnung wird intensiv fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/83/4: Vor Ort: Starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, weitere Maßnahmen zur Personensuche laufen.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Intensive Suche nach vermisster Person in der Wohnung wird weiterhin unter stark eingeschränkter Sicht fortgesetzt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/82/1: Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, starke Rauchentwicklung, Maßnahmen zur Personenrettung laufen.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/83/4: Vor Ort: Starker Rauch, Person weiterhin unauffindbar, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Suche läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Atemschutznotfall ausgelöst. 1 Feuerwehrangehöriger",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "FL M 2/30/1: Intensive Personensuche in der Wohnung wird fortgesetzt, Sicht durch starke Rauchentwicklung weiterhin stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Staffelführer meldet Brandausbreitung auf benachbarte Wohnung durch Explosion. Erhöhung der Einsatzsstelle auf MANV 50, Patienten min. Lage auf Sicht: 5 Gelb, 1 Rot, 3 Grün",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 1/82/1: Starke Rauchentwicklung persistiert, Atemnot bei Einsatzkraft, Patient weiterhin unauffindbar, Vitalwerte unverändert, Suche läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Staffelführer meldet Brandausbreitung auf benachbarte Wohnung durch Explosion. Erhöhung der Einsatzsstelle auf MANV 50, Patienten min. Lage auf Sicht: 5 Gelb, 1 Rot, 3 Grün",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 1/83/4: Patient unauffindbar, starker Rauch, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28. Suche nach Person wird fortgesetzt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Intensive Suche nach der vermissten Person in der Wohnung fortgesetzt, Sicht durch Rauchentwicklung weiterhin stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/82/1: Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, starke Rauchentwicklung bleibt, Suche nach vermisster Person läuft intensiv.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "📻 RK M 1/82/1: Sicht weiterhin stark eingeschränkt, Atemnot bei Einsatzkraft anhält. Suche nach vermisster Person wird intensiv fortgesetzt.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/82/1: Starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Suche nach vermisster Person läuft weiter intensiv.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/1: disponiert (RTW)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/2: disponiert (RTW)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/3: disponiert (RTW)",
+          "meta": "memory"
+        },
+        {
+          "content": "KI-Vorschlag umgesetzt: RTW, RTW, RTW (zugeteilt: RK M 2/83/1, RK M 2/83/2, RK M 2/83/3)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/1: Anfahrt zur Einsatzstelle in der Müllerstraße, ETA unbestimmt wegen hoher Verkehrsbelastung durch Einsatz.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "📻 RK M 2/83/1: Anfahrt zur Einsatzstelle Adlschalkweg 16, Rauchentwicklung stark. ETA unbestimmt, Verkehrbehindernisse durch Einsatzlage. Weiteres folgt.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/2: Anfahrt zur Einsatzstelle Müllerstraße, ETA unbestimmt aufgrund von hohen Verkehrsbelastungen durch den Einsatz.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "RK M 2/83/3: Anfahrt zur Einsatzstelle Müllerstraße, ETA unbestimmt, hohe Verkehrsbelastung durch anhaltenden Einsatz und Rückstau.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Wohnungsbrand gelöscht. Nach Erstsichtung 5 Gelb, 2 Rot, 6 Grün",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 2/83/1: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/2: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/3: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/1: Patient nicht auffindbar, Atemnot und starke Rauchentwicklung, Suche wird fortgesetzt. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "📻 RK M 2/83/1: Patient nicht auffindbar, Situation unverändert. Atemnot bei Einsatzkraft, weitere Suche nach vermisster Person läuft. Werte: n/a, weitere Unterstützung angefragt.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/2: Patient nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 130, Atemfrequenz 30, Suche dauert an. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient nicht auffindbar, starke Rauchentwicklung, keine Werte bekannt. Einsatzkräfte setzen Suche nach vermisster Person fort.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/1: Patient nicht auffindbar, Atemnot bei Einsatzkraft, Puls 125, Atemfrequenz 26. Suche nach vermisster Person wird fortgesetzt. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 135, Atemfrequenz 32. Suche nach vermisster Person läuft anhaltend.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Einsatzkräfte setzten zielgerichtete Suche nach vermisster Person fort. Werte:",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW meldet 5 Stöckiges gebäude, Brandursache wird gesucht, Patienten werden durch RTWs versorgt.",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 2/83/1: Patient nicht gefunden, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28. Suche nach vermisster Person wird fortgesetzt. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 130, Atemfrequenz 30. Suche wird fortgesetzt. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient nicht auffindbar, starke Rauchentwicklung, Einsatzkräfte setzen gezielte Suche fort. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/1: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 125, Atemfrequenz 27. Suche nach vermisster Person läuft. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) 1 Atemschutznotfall gemeldet, 1 zusätzlichen RTW benötigt, 2 zusätzliche HLFs benötigt",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 2/83/2: Patient nach wie vor nicht gefunden, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 128, Atemfrequenz 29. Suche läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 132, Atemfrequenz 31. Suche wird unvermindert fortgesetzt. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/1: Patient weiterhin nicht gefunden, Atemnot bei Einsatzkraft, Puls 126, Atemfrequenz 28. Suche nach vermisster Person geht weiter. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "📻 RK M 2/83/1: Suchoperation nach vermisster Person wird fortgesetzt. Atemnot bei der Einsatzkraft, Puls 125, Atemfrequenz 28. Werte werden aktuell erfasst.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 129, Atemfrequenz 30. Suche dauert an. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 130, Atemfrequenz 32. Suche läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/1: Patient noch immer nicht gefunden, Atemnot bei Einsatzkraft, Puls 124, Atemfrequenz 26. Suche nach vermisster Person wird fortgesetzt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/2: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 131, Atemfrequenz 31. Suche läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 133, Atemfrequenz 30. Suche wird intensiv fortgesetzt. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/1: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 122, Atemfrequenz 27. Suche nach vermisster Person geht weiter. Werte: n/",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 130, Atemfrequenz 29. Suche nach vermisster Person läuft anhaltend.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 135, Atemfrequenz 31. Suche läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/1: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 125, Atemfrequenz 28. Suche nach vermisster Person läuft. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 128, Atemfrequenz 30. Suche wird intensiv fortgesetzt. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 134, Atemfrequenz 30. Suche läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/1: Patient weiterhin nicht gefunden, Atemnot bei Einsatzkraft, Puls 127, Atemfrequenz 29. Suche nach vermisster Person läuft. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/2: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 129, Atemfrequenz 30. Suche läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 136, Atemfrequenz 31. Suche wird unvermindert fortgesetzt. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/1: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 126, Atemfrequenz 28. Suche nach vermisster Person läuft. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "📻 RK M 2/83/1: Suche nach vermisster Person wird fortgesetzt. Atemnot bei Einsatzkraft, Puls 125, Atemfrequenz 29. Werte werden aktuell erfasst.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 128, Atemfrequenz 30. Suche läuft intensiv weiter. Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 137, Atemfrequenz 32. Suche läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/59/50: disponiert (FW_GW_SAN)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/59/50: Anfahrt zur Müllerstraße, Wohnungsbrand, starke Rauchentwicklung, ETA 2 Minuten.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "📻 FL M 1/59/50: FL M 1/59/50 in Anfahrt, ETA 1 Minute. Bereite Empfang für Unterstützung bei der Personensuche vor. Details zur Lage sind bekannt.",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Rückfahrt zur Wache, Status 1.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "RK M 1/82/1: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/82/1: Rückfahrt zur Wache, Status 1.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "FL M 2/11/1: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/11/1: Rückfahrt zur Wache, Status 1.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "FL M 1/11/1: disponiert (FW_ELW)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/11/1: Anfahrt zur Müllerstraße, Wohnungsbrand, ETA 3 Minuten, starke Rauchentwicklung und vermisste Person in der Wohnung.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW zur Ablöse nachalarmiert",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 2/83/4: disponiert (RTW)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: disponiert (FW_HLF)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/2: disponiert (FW_HLF)",
+          "meta": "memory"
+        },
+        {
+          "content": "KI-Vorschlag umgesetzt: RTW, FW_HLF, FW_HLF (zugeteilt: RK M 2/83/4, FL M 2/46/1, FL M 2/46/2)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/4: Anfahrt zur Müllerstraße, Wohnungsbrand mit vermisster Person, ETA 2 Minuten. Stelle mich auf Unterstützung bei der Personensuche ein.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "FL M 2/46/1: Anfahrt zur Müllerstraße, Wohnungsbrand mit vermisster Person, ETA 1 Minute, starke Rauchentwicklung in der Umgebung.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "FL M 2/46/2: Anfahrt zur Müllerstraße, Wohnungsbrand mit vermisster Person, ETA 1 Minute, starke Rauchentwicklung.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW meldet Sichtung erfolgt. Keine weiteren Patienten, 8 Patienten in Erstbehandlung, 1 NEF zur Ablöse, 2 Transport von RTW wird eingeleitet - Ein zusätzlicher RTW angefordert für Transport Atemschutznotfall",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 1/83/4: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/83/4: Rückfahrt zur Wache, Status 1.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW meldet Feuer aus. Letzte Suche nach vermissten Personen. 1 EX - RTW für Patienten",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "FL M 2/46/1: Materialverbrauch: con_fuel_mix×1200, con_saw_chain_oil×300, con_gloves_work×4, con_marking_tape×2, con_cable_ties×30",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Gerätecheck: dev_scba_set:ok, dev_thermal_cam:defekt",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Einsatz beendet, mehrere Verbrauchsmaterialien genutzt und eine Wärmebildkamera hat einen Defekt.",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/59/50: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude läuft, starker Rauch, Temperaturanstieg wahrgenommen, weitere Kräfte unterstützen bei der Suche.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 80°C, Vermisster bisher nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 3/82/1: disponiert (NEF)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 3/82/1: Anfahrt zur Müllerstraße, Wohnungsbrand mit vermisster Person, ETA 1 Minute, Einsatzstelle stark verraucht.",
+          "meta": "Anfahrt"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 90°C, Vermisster weiterhin als nicht gefunden gemeldet.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude läuft, starker Rauch, Temperatur weiterhin hoch, Vermisster noch nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster nach wie vor nicht aufgefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster noch nicht aufgefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht aufgefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude wird fortgesetzt, weiterhin starke Rauchentwicklung, Temperatur bei 100°C, Vermisster noch nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperaturen bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude geht weiter, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht aufgefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/4: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/4: Patientenkontakt hergestellt, Bewusstseinszustand: nicht ansprechbar, Vitalzeichen: RR n/a, Puls n/a, Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin hoch, Vermisster weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Rückfahrt zur Wache nach Patientenkontakt, Zustand stabil, Werte: n/a.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude geht weiter, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht aufgefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/4: Patient stabil, Bewusstseinszustand: nicht ansprechbar, Vitalzeichen: RR n/a, Puls n/a, Werte: n/a, Transport zum Krankenhaus eingeleitet.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/4: Transport zum Krankenhaus eingeleitet, Patient stabil, Bewusstseinszustand: nicht ansprechbar, Vitalzeichen: RR n/a, Puls n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin bei 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/11/1: Materialverbrauch: con_marker_pens×3, con_notepads×2, con_hand_disinfectant×150, con_surface_wipes×20",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/11/1: Gerätecheck: dev_laptop:ok, dev_camera:defekt",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/11/1: Verbrauch von Markierstiften und Notizblöcken für die Einsatzdokumentation; Kamera defekt.",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/11/1: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/4: Patientenübergabe im Krankenhaus durchgeführt, Zustand stabil, Bewusstseinszustand: nicht ansprechbar, Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht aufgefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/4: Rückfahrt zur Wache nach Patientübergabe, Zustand stabil, Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude wird weiterhin fortgeführt, starke Rauchentwicklung, Temperatur konstant bei 100°C, Vermisster nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/2: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/82/1: Materialverbrauch: con_gloves_nitrile×6, con_hand_disinfectant×150, con_ecg_electrodes×10, con_iv_cannula_mix×2, con_syringes_mix×5, con_airway_disposables×3, con_masks_surgical×5, con_oxygen_mask×2",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/82/1: Gerätecheck: dev_pulseox:defekt, dev_suction:ok",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/82/1: Verbrauchsanalyse nach Einsatz bei Wohnungsbrand mit Gesundheitsrisiken.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/82/1: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Zustand unverändert, Vermisster weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/11/1: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR n/a, Puls n/a, Werte: n/a, Rettungskräfte unterstützen bei Suche.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude wird intensiver fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin 100°C, kein Fortschritt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW meldet Feuer aus. Verrauchung wird mit Lüfter entfernt.",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Sicht stark eingeschränkt, weitere Unterstützung benötigt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR nicht messbar, Puls 40, Rettungskräfte übernehmen weitere Maßnahmen.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Personensuche im Gebäude wird weitergeführt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Sicht stark eingeschränkt, Unterstützung angefordert.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR nicht messbar, Puls 40, weitere Maßnahmen durch Rettungskräfte.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur stabil bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird weiterhin fortgeführt, Sicht stark eingeschränkt, Unterstützung weiterhin benötigt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR nicht messbar, Puls 40, weitere Maßnahmen werden durchgeführt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur stabil bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Sicht stark eingeschränkt, weitere Unterstützung dringend nötig.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR nicht messbar, Puls 40, intensivierte Maßnahmen durch Rettungskräfte.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin stabil bei 100°C, Vermisster weiterhin nicht gefund",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/2: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird intensiv fortgeführt, Sicht weiterhin stark eingeschränkt, zusätzliche Unterstützung weiterhin angefordert.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur stabil bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 1/83/4: Materialverbrauch: con_gloves_nitrile×16, con_masks_surgical×10, con_hand_disinfectant×150, con_surface_wipes×20, con_gauze×15, con_bandage_roll×8, con_trauma_dressing×5, con_ecg_electrodes×18, con_spo2_disposable×5, con_iv_cannula_mix×3, con_iv_tubing×5, con_oxygen_mask×6",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/83/4: Gerätecheck: dev_monitor_defib:defekt",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/83/4: Verbrauch während des Einsatzes, hauptsächlich Handschuhe und Masken.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 1/83/4: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/2: Rückfahrt zur Wache, keine weiteren Patienten oder Maßnahmen erforderlich.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "FL M 2/30/1: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, Sicht weiterhin stark eingeschränkt, Unterstützung wird dringend benötigt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche im Gebäude fortgesetzt, Rauchentwicklung unverändert stark, Temperatur weiterhin bei 100°C, Vermisster nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/30/1: Rückfahrt zur Wache, Einsatz wurde abgebrochen, weiterer Bedarf an Unterstützung vor Ort erkannt.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird weiterhin intensiv fortgeführt, Sicht stark eingeschränkt, Unterstützung weiterhin dringend benötigt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche im Gebäude fortgeführt, Rauchentwicklung weiterhin stark, Temperatur stabil bei 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, Sicht bleibt stark eingeschränkt, zusätzliche Unterstützung angefordert.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, Temperatur weiterhin bei 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/3: Materialverbrauch: con_gloves_nitrile×4, con_masks_surgical×3, con_hand_disinfectant×200, con_gauze×10, con_bandage_roll×5, con_trauma_dressing×2, con_oxygen_mask×2, con_spo2_disposable×1",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/3: Gerätecheck: dev_monitor_defib:defekt",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/3: Bei einem Wohnungsbrand wurden mehrere Verbrauchsmaterialien genutzt, ein Monitor/Defibrillator ist ausgefallen.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/3: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird fortgeführt, Sicht stark eingeschränkt, Unterstützung weiterhin dringend benötigt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 1/11/1: Personensuche im Gebäude wird intensiv fortgesetzt, Unterstützung weiterhin erforderlich, Sicht bleibt stark eingeschränkt.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 3/82/1: Eintreffen an Einsatzstelle",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 3/82/1: Der Patient zeigt eine reduzierte Bewusstseinslage (GCS 9), Temperatur 39°C, erste Werte stabil, Unterstützung läuft.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 3/82/1: Der Patient zeigt sich weiterhin mit GCS 9, stabiler Kreislauf, jedoch Atemnot (AF 28), Transport zum Krankenhaus wird vorbereitet.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 3/82/1: Patient wird mit GCS 9, stabilen Vitalzeichen und Atemnot (AF 28) ins Krankenhaus transportiert. Weitere Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) RTW transportiert u.a. Patienten + Atemschutznotfall, verunfallter Feuerwehrangehöriger - keine weiteren RTWs benötigt",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 3/82/1: Patientenübergabe im Krankenhaus erfolgt, GCS 9, stabile Vitalzeichen, Atemnot persisten, Werte: n/a.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 3/82/1: Rückfahrt zur Wache, Einsatz beendet, keine weiteren Informationen verfügbar.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 3/82/1: Rückfahrt zur Wache, Einsatz beendet, keine weiteren Informationen verfügbar.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 3/82/1: Rückfahrt zur Wache, Einsatz für RK M 3/82/1 beendet, Meldung über vermisste Person bleibt bestehen.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 3/82/1: Status 1, Rückfahrt zur Wache abgeschlossen, Meldung über vermisste Person bleibt bestehen.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 3/82/1: Status 1, wieder einsatzbereit, Meldung über vermisste Person bleibt bestehen.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "RK M 2/83/2: Materialverbrauch: con_gloves_nitrile×10, con_masks_surgical×5, con_hand_disinfectant×200, con_surface_wipes×15, con_gauze×20, con_bandage_roll×10, con_trauma_dressing×5, con_spo2_disposable×3, con_iv_cannula_mix×5, con_oxygen_mask×2",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/2: Materialverbrauch für Einsatz bei Wohnungsbrand mit vermisster Person.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/2: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 3/82/1: Rückfahrt zur Wache, Meldung über vermisste Person bleibt bestehen, weitere Informationen stehen nicht zur Verfügung.",
+          "meta": "Vor Ort"
+        },
+        {
+          "content": "FL M 2/46/1: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Rückfahrt zur Wache, Meldung über vermisste Person bleibt bestehen, keine weiteren Informationen verfügbar.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "FL M 2/30/1: Materialverbrauch: con_marking_tape×2, con_light_sticks×5, con_gloves_work×3, con_rope_protection×2, con_disposable_hoods×2, con_surface_wipes×15",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/30/1: Gerätecheck: dev_first_aid_kit:defekt",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/30/1: Verbrauchte Materialien aufgrund von Brandbekämpfung und Sicherungsmaßnahmen.",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/30/1: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/4: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/4: Rückfahrt zur Wache, Einsatz beendet, Meldung über vermisste Person bleibt bestehen, weitere Informationen nicht verfügbar.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Feuer ist aus, Brandrauch entfernt. DLK entlassen. HLF zur Lüftung, Rauchgas - im Einsatz gewesen 2 C Rohr.",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 2/83/1: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/1: Rückfahrt zur Wache, Einsatz für RK M 2/83/1 beendet, Meldung über vermisste Person bleibt bestehen.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) 1 Person EX, vermutlich vermisste Person, Übergabe an Pol. Einsatzende.",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "FL M 2/46/1: Materialverbrauch: con_absorbent×10, con_gloves_work×2, con_marking_tape×2, con_battery_pack×4, con_fuel_mix×500, con_cutting_discs×3",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Gerätecheck: dev_scba_set:defekt, dev_generator:ok",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: Während des Einsatzes wurden Materialien benötigt, insbesondere zur Brandbekämpfung und für die Sicherheit der Einsatzkräfte.",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/1: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/4: Materialverbrauch: con_gloves_nitrile×6, con_masks_surgical×4, con_hand_disinfectant×200, con_gauze×10, con_bandage_roll×5, con_trauma_dressing×2, con_oxygen_mask×1",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/4: Gerätecheck: dev_stretcher:defekt",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/4: Verbrauchte Materialien aufgrund einer intensiven Betreuung des Patienten während des Wohnungsbrands.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/4: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) GW San Sichtung abgeschlossen. Tatsächlich 4 Gelb, 2 Rot, 1 Atemschutznotfall transportiert.",
+          "meta": "admin_injected"
+        },
+        {
+          "content": "RK M 2/83/1: Materialverbrauch: con_gloves_nitrile×10, con_masks_surgical×5, con_gauze×15, con_trauma_dressing×8, con_iv_cannula_mix×3, con_oxygen_mask×2, con_nasal_cannula×1",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/1: Gerätecheck: dev_monitor_defib:ok, dev_stretcher:defekt",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/1: Verbrauchte Materialien während des Einsatzes; ein Gerät defekt.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 2/83/1: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/11/1: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/11/1: Rückfahrt zur Wache, Einsatz beendet, Meldung über vermisste Person bleibt bestehen, weitere Informationen nicht verfügbar.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "RK M 3/82/1: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 3/82/1: Rückfahrt zur Wache, Einsatz für RK M 3/82/1 beendet, Meldung über vermisste Person bleibt bestehen.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "FL M 2/46/2: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/2: Rückfahrt zur Wache, Einsatz abgeschlossen, Informationen zur vermissten Person liegen nicht vor.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "FL M 1/59/50: Rückfahrt zur Wache",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/59/50: Rückfahrt zur Wache, Einsatz beendet, Informationen zur vermissten Person sind weiterhin unklar.",
+          "meta": "Rückfahrt"
+        },
+        {
+          "content": "FL M 1/11/1: Materialverbrauch: con_paper×5, con_ink×1, con_marker_pens×3, con_hand_disinfectant×100, con_surface_wipes×10",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/11/1: Gerätecheck: dev_camera:defekt, dev_router:ok",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/11/1: Einsatz erfolgreich beendet, jedoch Kamera beschädigt.",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/11/1: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/2: Materialverbrauch: con_gloves_work×3, con_fire_extinguisher_set×1, con_fuel_mix×500, con_marking_tape×2, con_sorbent_pads×10",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/2: Gerätecheck: dev_scba_set:defekt",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/2: Ein SCBA-Set hatte Dichtungsprobleme, andere Materialien wurden für den Einsatz benötigt.",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 2/46/2: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 3/82/1: Materialverbrauch: con_gloves_nitrile×8, con_hand_disinfectant×100, con_ecg_electrodes×5, con_iv_cannula_mix×2, con_syringes_mix×4, con_masks_surgical×3, con_oxygen_mask×2, con_airway_disposables×2",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 3/82/1: Einsatz erfolgreich abgeschlossen, mehrere Verbrauchsmaterialien verwendet.",
+          "meta": "memory"
+        },
+        {
+          "content": "RK M 3/82/1: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/59/50: Materialverbrauch: con_gloves_nitrile×15, con_masks_surgical×10, con_ffp2×5, con_gauze×20, con_bandage_roll×5, con_trauma_dressing×3, con_blankets×10, con_marking_tape×1",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/59/50: Gerätecheck: dev_generator:defekt, dev_triage_kit:ok",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/59/50: Materialverbrauch nach Wohnungsbrand-Einsatz mit vereinzelten Gerätedefekten.",
+          "meta": "memory"
+        },
+        {
+          "content": "FL M 1/59/50: wieder frei (Status 1)",
+          "meta": "memory"
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Patient nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Maßnahmen im Fortgang.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Rauchentwicklung weiterhin stark, Suche nach vermisster Person wird intensiv fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: Rauchentwicklung weiterhin stark, Suche nach vermisster Person in der betroffenen Wohnung wird intensiv fortgesetzt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Vor Ort: Person weiterhin unauffindbar, starker Rauch, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Maßnahmen werden fortgeführt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Aktuelle Suche nach der vermissten Person in der Wohnung wird unter extremen Bedingungen fortgesetzt, Sicht weiterhin stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Patient weiterhin unauffindbar, starke Rauchentwicklung, Einsatzkräfte kämpfen mit Atemnot, Puls 120, Atemfrequenz 28, Maßnahmen im Fortgang",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Rauchentwicklung weiterhin stark, Suche nach vermisster Person wird durch gezielte Einsätze in der Wohnung fortgesetzt, Sicht stark eingesch",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: Rauchentwicklung weiter stark, Suche nach vermisster Person in der betroffenen Wohnung wird fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | 📻 FL M 2/11/1: Suche nach vermisster Person in der Wohnung wird fortgesetzt. Raucheinwirkung bleibt stark, Sichtverhältnisse weiterhin stark eingeschränkt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Patient weiterhin unauffindbar, starker Rauch, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, weitere Maßnahmen laufen.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Suche nach vermisster Person in der betroffenen Wohnung wird unter extremen Bedingungen fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Vor Ort: Starke Rauchentwicklung, schwierige Sichtverhältnisse, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Maßnahmen in Planung.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Rauchentwicklung weiterhin stark, intensive Suche nach vermisster Person in der Wohnung wird unter extremen Bedingungen fortgesetzt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: Rauchentwicklung bleibt stark, Suche nach vermisster Person in der betroffenen Wohnung wird intensiv fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Vor Ort: Vermisste Person weiterhin unauffindbar, starker Rauch, Puls 120, Atemfrequenz 28, Einsatzkräfte sind im Einsatz.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Rauchentwicklung bleibt weiterhin stark, Suche nach der vermissten Person in der Wohnung wird unter extremen Bedingungen fortgesetzt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, starke Rauchentwicklung weiterhin, Suche nach Person läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Intensive Suche nach vermisster Person wird fortgesetzt, Sicht aufgrund der Rauchentwicklung weiter stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: Rauchentwicklung bleibt stark, Suche nach vermisster Person in der betroffenen Wohnung wird intensiv fortgesetzt, Sicht stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Vor Ort: Starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, weitere Maßnahmen zur Personensuche laufen.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Intensive Suche nach vermisster Person in der Wohnung wird weiterhin unter stark eingeschränkter Sicht fortgesetzt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, starke Rauchentwicklung, Maßnahmen zur Personenrettung laufen.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Vor Ort: Starker Rauch, Person weiterhin unauffindbar, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Suche läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Atemschutznotfall ausgelöst. 1 Feuerwehrangehöriger",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Intensive Personensuche in der Wohnung wird fortgesetzt, Sicht durch starke Rauchentwicklung weiterhin stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Staffelführer meldet Brandausbreitung auf benachbarte Wohnung durch Explosion. Erhöhung der Einsatzsstelle auf MANV 50, Patienten min. Lage auf Sicht: 5 Gelb, 1 Rot, 3 Grün",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Starke Rauchentwicklung persistiert, Atemnot bei Einsatzkraft, Patient weiterhin unauffindbar, Vitalwerte unverändert, Suche läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Staffelführer meldet Brandausbreitung auf benachbarte Wohnung durch Explosion. Erhöhung der Einsatzsstelle auf MANV 50, Patienten min. Lage auf Sicht: 5 Gelb, 1 Rot, 3 Grün",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Patient unauffindbar, starker Rauch, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28. Suche nach Person wird fortgesetzt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Intensive Suche nach der vermissten Person in der Wohnung fortgesetzt, Sicht durch Rauchentwicklung weiterhin stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, starke Rauchentwicklung bleibt, Suche nach vermisster Person läuft intensiv.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | 📻 RK M 1/82/1: Sicht weiterhin stark eingeschränkt, Atemnot bei Einsatzkraft anhält. Suche nach vermisster Person wird intensiv fortgesetzt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28, Suche nach vermisster Person läuft weiter intensiv.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: disponiert (RTW)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: disponiert (RTW)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: disponiert (RTW)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | KI-Vorschlag umgesetzt: RTW, RTW, RTW (zugeteilt: RK M 2/83/1, RK M 2/83/2, RK M 2/83/3)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": null,
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Anfahrt zur Einsatzstelle in der Müllerstraße, ETA unbestimmt wegen hoher Verkehrsbelastung durch Einsatz.",
+          "meta": {
+            "source": "Anfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | 📻 RK M 2/83/1: Anfahrt zur Einsatzstelle Adlschalkweg 16, Rauchentwicklung stark. ETA unbestimmt, Verkehrbehindernisse durch Einsatzlage. Weiteres folgt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Anfahrt zur Einsatzstelle Müllerstraße, ETA unbestimmt aufgrund von hohen Verkehrsbelastungen durch den Einsatz.",
+          "meta": {
+            "source": "Anfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Anfahrt zur Einsatzstelle Müllerstraße, ETA unbestimmt, hohe Verkehrsbelastung durch anhaltenden Einsatz und Rückstau.",
+          "meta": {
+            "source": "Anfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Wohnungsbrand gelöscht. Nach Erstsichtung 5 Gelb, 2 Rot, 6 Grün",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Eintreffen an Einsatzstelle",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Eintreffen an Einsatzstelle",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Eintreffen an Einsatzstelle",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient nicht auffindbar, Atemnot und starke Rauchentwicklung, Suche wird fortgesetzt. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | 📻 RK M 2/83/1: Patient nicht auffindbar, Situation unverändert. Atemnot bei Einsatzkraft, weitere Suche nach vermisster Person läuft. Werte: n/a, weitere Unterstützung angefragt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 130, Atemfrequenz 30, Suche dauert an. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient nicht auffindbar, starke Rauchentwicklung, keine Werte bekannt. Einsatzkräfte setzen Suche nach vermisster Person fort.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient nicht auffindbar, Atemnot bei Einsatzkraft, Puls 125, Atemfrequenz 26. Suche nach vermisster Person wird fortgesetzt. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 135, Atemfrequenz 32. Suche nach vermisster Person läuft anhaltend.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Einsatzkräfte setzten zielgerichtete Suche nach vermisster Person fort. Werte:",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW meldet 5 Stöckiges gebäude, Brandursache wird gesucht, Patienten werden durch RTWs versorgt.",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient nicht gefunden, Atemnot bei Einsatzkraft, Puls 120, Atemfrequenz 28. Suche nach vermisster Person wird fortgesetzt. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 130, Atemfrequenz 30. Suche wird fortgesetzt. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient nicht auffindbar, starke Rauchentwicklung, Einsatzkräfte setzen gezielte Suche fort. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 125, Atemfrequenz 27. Suche nach vermisster Person läuft. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) 1 Atemschutznotfall gemeldet, 1 zusätzlichen RTW benötigt, 2 zusätzliche HLFs benötigt",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient nach wie vor nicht gefunden, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 128, Atemfrequenz 29. Suche läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 132, Atemfrequenz 31. Suche wird unvermindert fortgesetzt. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient weiterhin nicht gefunden, Atemnot bei Einsatzkraft, Puls 126, Atemfrequenz 28. Suche nach vermisster Person geht weiter. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | 📻 RK M 2/83/1: Suchoperation nach vermisster Person wird fortgesetzt. Atemnot bei der Einsatzkraft, Puls 125, Atemfrequenz 28. Werte werden aktuell erfasst.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 129, Atemfrequenz 30. Suche dauert an. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 130, Atemfrequenz 32. Suche läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient noch immer nicht gefunden, Atemnot bei Einsatzkraft, Puls 124, Atemfrequenz 26. Suche nach vermisster Person wird fortgesetzt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 131, Atemfrequenz 31. Suche läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 133, Atemfrequenz 30. Suche wird intensiv fortgesetzt. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 122, Atemfrequenz 27. Suche nach vermisster Person geht weiter. Werte: n/",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 130, Atemfrequenz 29. Suche nach vermisster Person läuft anhaltend.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 135, Atemfrequenz 31. Suche läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 125, Atemfrequenz 28. Suche nach vermisster Person läuft. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 128, Atemfrequenz 30. Suche wird intensiv fortgesetzt. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 134, Atemfrequenz 30. Suche läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient weiterhin nicht gefunden, Atemnot bei Einsatzkraft, Puls 127, Atemfrequenz 29. Suche nach vermisster Person läuft. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 129, Atemfrequenz 30. Suche läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 136, Atemfrequenz 31. Suche wird unvermindert fortgesetzt. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 126, Atemfrequenz 28. Suche nach vermisster Person läuft. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | 📻 RK M 2/83/1: Suche nach vermisster Person wird fortgesetzt. Atemnot bei Einsatzkraft, Puls 125, Atemfrequenz 29. Werte werden aktuell erfasst.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Patient weiterhin nicht auffindbar, Atemnot bei Einsatzkraft, Puls 128, Atemfrequenz 30. Suche läuft intensiv weiter. Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Patient weiterhin nicht auffindbar, starke Rauchentwicklung, Atemnot bei Einsatzkraft, Puls 137, Atemfrequenz 32. Suche läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: disponiert (FW_GW_SAN)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Anfahrt zur Müllerstraße, Wohnungsbrand, starke Rauchentwicklung, ETA 2 Minuten.",
+          "meta": {
+            "source": "Anfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | 📻 FL M 1/59/50: FL M 1/59/50 in Anfahrt, ETA 1 Minute. Bereite Empfang für Unterstützung bei der Personensuche vor. Details zur Lage sind bekannt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Rückfahrt zur Wache, Status 1.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Rückfahrt zur Wache, Status 1.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: Rückfahrt zur Wache, Status 1.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: disponiert (FW_ELW)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Anfahrt zur Müllerstraße, Wohnungsbrand, ETA 3 Minuten, starke Rauchentwicklung und vermisste Person in der Wohnung.",
+          "meta": {
+            "source": "Anfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW zur Ablöse nachalarmiert",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: disponiert (RTW)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: disponiert (FW_HLF)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: disponiert (FW_HLF)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | KI-Vorschlag umgesetzt: RTW, FW_HLF, FW_HLF (zugeteilt: RK M 2/83/4, FL M 2/46/1, FL M 2/46/2)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": null,
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Anfahrt zur Müllerstraße, Wohnungsbrand mit vermisster Person, ETA 2 Minuten. Stelle mich auf Unterstützung bei der Personensuche ein.",
+          "meta": {
+            "source": "Anfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Anfahrt zur Müllerstraße, Wohnungsbrand mit vermisster Person, ETA 1 Minute, starke Rauchentwicklung in der Umgebung.",
+          "meta": {
+            "source": "Anfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Anfahrt zur Müllerstraße, Wohnungsbrand mit vermisster Person, ETA 1 Minute, starke Rauchentwicklung.",
+          "meta": {
+            "source": "Anfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW meldet Sichtung erfolgt. Keine weiteren Patienten, 8 Patienten in Erstbehandlung, 1 NEF zur Ablöse, 2 Transport von RTW wird eingeleitet - Ein zusätzlicher RTW angefordert für Transport Atemschutznotfall",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Rückfahrt zur Wache, Status 1.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW meldet Feuer aus. Letzte Suche nach vermissten Personen. 1 EX - RTW für Patienten",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Materialverbrauch: con_fuel_mix×1200, con_saw_chain_oil×300, con_gloves_work×4, con_marking_tape×2, con_cable_ties×30",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Gerätecheck: dev_scba_set:ok, dev_thermal_cam:defekt",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Einsatz beendet, mehrere Verbrauchsmaterialien genutzt und eine Wärmebildkamera hat einen Defekt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Eintreffen an Einsatzstelle",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude läuft, starker Rauch, Temperaturanstieg wahrgenommen, weitere Kräfte unterstützen bei der Suche.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 80°C, Vermisster bisher nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: disponiert (NEF)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Anfahrt zur Müllerstraße, Wohnungsbrand mit vermisster Person, ETA 1 Minute, Einsatzstelle stark verraucht.",
+          "meta": {
+            "source": "Anfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 90°C, Vermisster weiterhin als nicht gefunden gemeldet.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Eintreffen an Einsatzstelle",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude läuft, starker Rauch, Temperatur weiterhin hoch, Vermisster noch nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster nach wie vor nicht aufgefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster noch nicht aufgefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht aufgefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude wird fortgesetzt, weiterhin starke Rauchentwicklung, Temperatur bei 100°C, Vermisster noch nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperaturen bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude geht weiter, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht aufgefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Eintreffen an Einsatzstelle",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Patientenkontakt hergestellt, Bewusstseinszustand: nicht ansprechbar, Vitalzeichen: RR n/a, Puls n/a, Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin hoch, Vermisster weiterhin nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Rückfahrt zur Wache nach Patientenkontakt, Zustand stabil, Werte: n/a.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude geht weiter, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht aufgefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Patient stabil, Bewusstseinszustand: nicht ansprechbar, Vitalzeichen: RR n/a, Puls n/a, Werte: n/a, Transport zum Krankenhaus eingeleitet.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Transport zum Krankenhaus eingeleitet, Patient stabil, Bewusstseinszustand: nicht ansprechbar, Vitalzeichen: RR n/a, Puls n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin bei 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: Materialverbrauch: con_marker_pens×3, con_notepads×2, con_hand_disinfectant×150, con_surface_wipes×20",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: Gerätecheck: dev_laptop:ok, dev_camera:defekt",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: Verbrauch von Markierstiften und Notizblöcken für die Einsatzdokumentation; Kamera defekt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/11/1: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_2"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Patientenübergabe im Krankenhaus durchgeführt, Zustand stabil, Bewusstseinszustand: nicht ansprechbar, Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht aufgefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Rückfahrt zur Wache nach Patientübergabe, Zustand stabil, Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude wird weiterhin fortgeführt, starke Rauchentwicklung, Temperatur konstant bei 100°C, Vermisster nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Eintreffen an Einsatzstelle",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Materialverbrauch: con_gloves_nitrile×6, con_hand_disinfectant×150, con_ecg_electrodes×10, con_iv_cannula_mix×2, con_syringes_mix×5, con_airway_disposables×3, con_masks_surgical×5, con_oxygen_mask×2",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Gerätecheck: dev_pulseox:defekt, dev_suction:ok",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: Verbrauchsanalyse nach Einsatz bei Wohnungsbrand mit Gesundheitsrisiken.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/82/1: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Zustand unverändert, Vermisster weiterhin nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Eintreffen an Einsatzstelle",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR n/a, Puls n/a, Werte: n/a, Rettungskräfte unterstützen bei Suche.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude wird intensiver fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin 100°C, kein Fortschritt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) ELW meldet Feuer aus. Verrauchung wird mit Lüfter entfernt.",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Sicht stark eingeschränkt, weitere Unterstützung benötigt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR nicht messbar, Puls 40, Rettungskräfte übernehmen weitere Maßnahmen.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Personensuche im Gebäude wird weitergeführt, starke Rauchentwicklung, Temperatur bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Sicht stark eingeschränkt, Unterstützung angefordert.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR nicht messbar, Puls 40, weitere Maßnahmen durch Rettungskräfte.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche im Gebäude fortgesetzt, starke Rauchentwicklung, Temperatur stabil bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird weiterhin fortgeführt, Sicht stark eingeschränkt, Unterstützung weiterhin benötigt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR nicht messbar, Puls 40, weitere Maßnahmen werden durchgeführt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur stabil bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Sicht stark eingeschränkt, weitere Unterstützung dringend nötig.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Patientenstatus vor Ort: nicht ansprechbar, Vitalzeichen: RR nicht messbar, Puls 40, intensivierte Maßnahmen durch Rettungskräfte.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur weiterhin stabil bei 100°C, Vermisster weiterhin nicht gefund",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird intensiv fortgeführt, Sicht weiterhin stark eingeschränkt, zusätzliche Unterstützung weiterhin angefordert.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, starke Rauchentwicklung, Temperatur stabil bei 100°C, Vermisster weiterhin nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Materialverbrauch: con_gloves_nitrile×16, con_masks_surgical×10, con_hand_disinfectant×150, con_surface_wipes×20, con_gauze×15, con_bandage_roll×8, con_trauma_dressing×5, con_ecg_electrodes×18, con_spo2_disposable×5, con_iv_cannula_mix×3, con_iv_tubing×5, con_oxygen_mask×6",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Gerätecheck: dev_monitor_defib:defekt",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: Verbrauch während des Einsatzes, hauptsächlich Handschuhe und Masken.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | RK M 1/83/4: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 1/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_10"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Rückfahrt zur Wache, keine weiteren Patienten oder Maßnahmen erforderlich.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, Sicht weiterhin stark eingeschränkt, Unterstützung wird dringend benötigt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche im Gebäude fortgesetzt, Rauchentwicklung unverändert stark, Temperatur weiterhin bei 100°C, Vermisster nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Rückfahrt zur Wache, Einsatz wurde abgebrochen, weiterer Bedarf an Unterstützung vor Ort erkannt.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird weiterhin intensiv fortgeführt, Sicht stark eingeschränkt, Unterstützung weiterhin dringend benötigt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche im Gebäude fortgeführt, Rauchentwicklung weiterhin stark, Temperatur stabil bei 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird fortgesetzt, Sicht bleibt stark eingeschränkt, zusätzliche Unterstützung angefordert.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Personensuche im Gebäude wird fortgesetzt, Temperatur weiterhin bei 100°C, Vermisster nach wie vor nicht gefunden.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Materialverbrauch: con_gloves_nitrile×4, con_masks_surgical×3, con_hand_disinfectant×200, con_gauze×10, con_bandage_roll×5, con_trauma_dressing×2, con_oxygen_mask×2, con_spo2_disposable×1",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Gerätecheck: dev_monitor_defib:defekt",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: Bei einem Wohnungsbrand wurden mehrere Verbrauchsmaterialien genutzt, ein Monitor/Defibrillator ist ausgefallen.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/3: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/3",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_6"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird fortgeführt, Sicht stark eingeschränkt, Unterstützung weiterhin dringend benötigt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Personensuche im Gebäude wird intensiv fortgesetzt, Unterstützung weiterhin erforderlich, Sicht bleibt stark eingeschränkt.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Eintreffen an Einsatzstelle",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Der Patient zeigt eine reduzierte Bewusstseinslage (GCS 9), Temperatur 39°C, erste Werte stabil, Unterstützung läuft.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Der Patient zeigt sich weiterhin mit GCS 9, stabiler Kreislauf, jedoch Atemnot (AF 28), Transport zum Krankenhaus wird vorbereitet.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Patient wird mit GCS 9, stabilen Vitalzeichen und Atemnot (AF 28) ins Krankenhaus transportiert. Weitere Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) RTW transportiert u.a. Patienten + Atemschutznotfall, verunfallter Feuerwehrangehöriger - keine weiteren RTWs benötigt",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Patientenübergabe im Krankenhaus erfolgt, GCS 9, stabile Vitalzeichen, Atemnot persisten, Werte: n/a.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Rückfahrt zur Wache, Einsatz beendet, keine weiteren Informationen verfügbar.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Rückfahrt zur Wache, Einsatz beendet, keine weiteren Informationen verfügbar.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Rückfahrt zur Wache, Einsatz für RK M 3/82/1 beendet, Meldung über vermisste Person bleibt bestehen.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Status 1, Rückfahrt zur Wache abgeschlossen, Meldung über vermisste Person bleibt bestehen.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Status 1, wieder einsatzbereit, Meldung über vermisste Person bleibt bestehen.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Materialverbrauch: con_gloves_nitrile×10, con_masks_surgical×5, con_hand_disinfectant×200, con_surface_wipes×15, con_gauze×20, con_bandage_roll×10, con_trauma_dressing×5, con_spo2_disposable×3, con_iv_cannula_mix×5, con_oxygen_mask×2",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: Materialverbrauch für Einsatz bei Wohnungsbrand mit vermisster Person.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/2: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/2",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Rückfahrt zur Wache, Meldung über vermisste Person bleibt bestehen, weitere Informationen stehen nicht zur Verfügung.",
+          "meta": {
+            "source": "Vor Ort",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Rückfahrt zur Wache, Meldung über vermisste Person bleibt bestehen, keine weiteren Informationen verfügbar.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Materialverbrauch: con_marking_tape×2, con_light_sticks×5, con_gloves_work×3, con_rope_protection×2, con_disposable_hoods×2, con_surface_wipes×15",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Gerätecheck: dev_first_aid_kit:defekt",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: Verbrauchte Materialien aufgrund von Brandbekämpfung und Sicherungsmaßnahmen.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/30/1: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/30/1",
+            "vehicleType": "FW_DLK",
+            "vehicleId": "dlk_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Rückfahrt zur Wache, Einsatz beendet, Meldung über vermisste Person bleibt bestehen, weitere Informationen nicht verfügbar.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) Feuer ist aus, Brandrauch entfernt. DLK entlassen. HLF zur Lüftung, Rauchgas - im Einsatz gewesen 2 C Rohr.",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Rückfahrt zur Wache, Einsatz für RK M 2/83/1 beendet, Meldung über vermisste Person bleibt bestehen.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) 1 Person EX, vermutlich vermisste Person, Übergabe an Pol. Einsatzende.",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Materialverbrauch: con_absorbent×10, con_gloves_work×2, con_marking_tape×2, con_battery_pack×4, con_fuel_mix×500, con_cutting_discs×3",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Gerätecheck: dev_scba_set:defekt, dev_generator:ok",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: Während des Einsatzes wurden Materialien benötigt, insbesondere zur Brandbekämpfung und für die Sicherheit der Einsatzkräfte.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/1: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/1",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_3"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Materialverbrauch: con_gloves_nitrile×6, con_masks_surgical×4, con_hand_disinfectant×200, con_gauze×10, con_bandage_roll×5, con_trauma_dressing×2, con_oxygen_mask×1",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Gerätecheck: dev_stretcher:defekt",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: Verbrauchte Materialien aufgrund einer intensiven Betreuung des Patienten während des Wohnungsbrands.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/4: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/4",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_11"
+          }
+        },
+        {
+          "content": "#000053 | 🧩 Leitstelle: (Lageupdate, relevant für Nachforderung/AAO) GW San Sichtung abgeschlossen. Tatsächlich 4 Gelb, 2 Rot, 1 Atemschutznotfall transportiert.",
+          "meta": {
+            "source": "admin_injected",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "ADMIN",
+            "vehicleType": null,
+            "vehicleId": null
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Materialverbrauch: con_gloves_nitrile×10, con_masks_surgical×5, con_gauze×15, con_trauma_dressing×8, con_iv_cannula_mix×3, con_oxygen_mask×2, con_nasal_cannula×1",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Gerätecheck: dev_monitor_defib:ok, dev_stretcher:defekt",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: Verbrauchte Materialien während des Einsatzes; ein Gerät defekt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 2/83/1: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 2/83/1",
+            "vehicleType": "RTW",
+            "vehicleId": "rtw_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Rückfahrt zur Wache, Einsatz beendet, Meldung über vermisste Person bleibt bestehen, weitere Informationen nicht verfügbar.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Rückfahrt zur Wache, Einsatz für RK M 3/82/1 beendet, Meldung über vermisste Person bleibt bestehen.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Rückfahrt zur Wache, Einsatz abgeschlossen, Informationen zur vermissten Person liegen nicht vor.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Rückfahrt zur Wache",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Rückfahrt zur Wache, Einsatz beendet, Informationen zur vermissten Person sind weiterhin unklar.",
+          "meta": {
+            "source": "Rückfahrt",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Materialverbrauch: con_paper×5, con_ink×1, con_marker_pens×3, con_hand_disinfectant×100, con_surface_wipes×10",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Gerätecheck: dev_camera:defekt, dev_router:ok",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: Einsatz erfolgreich beendet, jedoch Kamera beschädigt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/11/1: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/11/1",
+            "vehicleType": "FW_ELW",
+            "vehicleId": "elw_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Materialverbrauch: con_gloves_work×3, con_fire_extinguisher_set×1, con_fuel_mix×500, con_marking_tape×2, con_sorbent_pads×10",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Gerätecheck: dev_scba_set:defekt",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: Ein SCBA-Set hatte Dichtungsprobleme, andere Materialien wurden für den Einsatz benötigt.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | FL M 2/46/2: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 2/46/2",
+            "vehicleType": "FW_HLF",
+            "vehicleId": "hlf_4"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Materialverbrauch: con_gloves_nitrile×8, con_hand_disinfectant×100, con_ecg_electrodes×5, con_iv_cannula_mix×2, con_syringes_mix×4, con_masks_surgical×3, con_oxygen_mask×2, con_airway_disposables×2",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: Einsatz erfolgreich abgeschlossen, mehrere Verbrauchsmaterialien verwendet.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | RK M 3/82/1: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "RK M 3/82/1",
+            "vehicleType": "NEF",
+            "vehicleId": "nef_5"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Materialverbrauch: con_gloves_nitrile×15, con_masks_surgical×10, con_ffp2×5, con_gauze×20, con_bandage_roll×5, con_trauma_dressing×3, con_blankets×10, con_marking_tape×1",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Gerätecheck: dev_generator:defekt, dev_triage_kit:ok",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: Materialverbrauch nach Wohnungsbrand-Einsatz mit vereinzelten Gerätedefekten.",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        },
+        {
+          "content": "#000053 | FL M 1/59/50: wieder frei (Status 1)",
+          "meta": {
+            "source": "memory",
+            "einsatzNr": "000053",
+            "eventId": "evt_mkdzvhut_u4nj62",
+            "callsign": "FL M 1/59/50",
+            "vehicleType": "FW_GW_SAN",
+            "vehicleId": "gw_san_1"
+          }
+        }
+      ]
+    }
+  },
+  "judge": {
+    "enabled": true,
+    "temperature": 0,
+    "max_tokens": 131072,
+    "per_doc_chars": 650,
+    "top_k": {
+      "Knowledge": 100,
+      "Memory": 200,
+      "Experiences": 100,
+      "Environment": 100
+    }
+  },
+  "_log": {
+    "runId": "srcot_1768397359157_c7f6a1",
+    "kind": "admin_doku",
+    "eventId": "evt_mkdzvhut_u4nj62",
+    "route": "/api/ai/admin",
+    "createdAt": "2026-01-14T13:29:19.157Z",
+    "llmProvider": "openai"
+  },
+  "public_export_exclusions": {
+    "corpora.Knowledge": "Local corpus path removed; referenced corpus not redistributed.",
+    "corpora.Experiences": "Local corpus path removed; referenced corpus not redistributed.",
+    "execution": "This partial historical request is not directly runnable without the omitted corpora."
+  }
+}
